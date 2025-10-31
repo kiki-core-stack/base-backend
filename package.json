@@ -2,9 +2,7 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "build": "bun run build:internal --outdir=./dist",
-    "build:internal": "rimraf ./dist && cross-env NODE_ENV=production bun --env-file=./.env.production.local build ./src/index.ts --minify --production --target bun",
-    "compile": "bun run build:internal --compile --outfile ./dist/index",
+    "build": "NODE_ENV=production bun run ./src/core/build.ts",
     "depcheck": "depcheck",
     "dev": "cross-env NODE_ENV=development bun --env-file=./.env.development.local --watch run ./src/index.ts",
     "lint": "eslint --max-warnings 0",
