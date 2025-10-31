@@ -1,8 +1,12 @@
 import { rm } from 'node:fs/promises';
+import { join } from 'node:path';
 
 import productionPlugins from '@/plugins/bun/production';
 
-import { projectDistDirPath } from './constants/paths';
+import {
+    projectDistDirPath,
+    projectSrcDirPath,
+} from './constants/paths';
 import { logger } from './globals/logger';
 
 logger.info('Cleaning output directory...');
@@ -17,12 +21,11 @@ await rm(
 // await import('./production-loader-generators/routes');
 
 logger.info('Starting build...');
-const buildOutput = await Bun.build({
+await Bun.build({
     entrypoints: [
-        './src/index.ts',
-        './src/production-entrypoint.ts',
+        join(projectSrcDirPath, 'index.ts'),
+        join(projectSrcDirPath, 'production-entrypoint.ts'),
     ],
-    format: 'esm',
     minify: true,
     outdir: projectDistDirPath,
     plugins: productionPlugins,
@@ -30,6 +33,5 @@ const buildOutput = await Bun.build({
     target: 'bun',
 });
 
-if (buildOutput.success) logger.success('Build completed');
-else logger.error('Build failed');
-process.exit(buildOutput.success ? 0 : 1);
+logger.success('Build completed');
+process.exit(0);
