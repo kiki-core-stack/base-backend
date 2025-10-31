@@ -1,13 +1,15 @@
 import { plugin as registerPlugin } from 'bun';
 import type { Server } from 'bun';
 
-import appConfig from '@/app.config';
 import { honoApp } from '@/core/app';
 import { logger } from '@/core/utils/logger';
 import { gracefulExit } from '@/graceful-exit';
 
-// Load plugins
-for (const plugin of appConfig.plugins) await registerPlugin(plugin);
+// Load bun plugins if development
+if (process.env.NODE_ENV === 'development') {
+    const { default: plugins } = await import('@/plugins/bun/development');
+    for (const plugin of plugins) await registerPlugin(plugin);
+}
 
 let server: Server<any> | undefined;
 process.on('SIGINT', () => gracefulExit(server));

@@ -1,9 +1,8 @@
 import { rm } from 'node:fs/promises';
 
-import {
-    projectDistDirPath,
-    projectRoot,
-} from './constants/paths';
+import productionPlugins from '@/plugins/bun/production';
+
+import { projectDistDirPath } from './constants/paths';
 import { logger } from './utils/logger';
 
 logger.info('Cleaning output directory...');
@@ -18,32 +17,19 @@ await rm(
 // await import('./production-loader-generators/routes');
 
 logger.info('Starting build...');
-const subprocess = Bun.spawn({
-    cmd: [
-        'bun',
-        '--env-file=./.env.production.local',
-        'build',
+const buildOutput = await Bun.build({
+    entrypoints: [
         './src/index.ts',
         './src/production-entrypoint.ts',
-        '--minify',
-        '--outdir=./dist',
-        '--production',
-        '--splitting',
-        '--target=bun',
     ],
-    cwd: projectRoot,
-    env: {
-        ...process.env,
-        NODE_ENV: 'production',
-    },
-    stdio: [
-        'ignore',
-        'inherit',
-        'inherit',
-    ],
+    format: 'esm',
+    minify: true,
+    outdir: projectDistDirPath,
+    plugins: productionPlugins,
+    splitting: true,
+    target: 'bun',
 });
 
-const exitCode = await subprocess.exited;
-if (exitCode === 0) logger.success('Build completed');
+if (buildOutput.success) logger.success('Build completed');
 else logger.error('Build failed');
-process.exit(exitCode);
+process.exit(buildOutput.success ? 0 : 1);

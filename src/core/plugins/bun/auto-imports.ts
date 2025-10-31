@@ -11,24 +11,20 @@ import {
     resolve,
 } from 'node:path';
 
+import { escapeRegExp } from 'es-toolkit';
 import { findExports } from 'mlly';
 import { createUnimport } from 'unimport';
-import type {
-    Import,
-    Unimport,
-} from 'unimport';
+import type { Import } from 'unimport';
 
-import { projectSrcDirPath } from '@/core/constants/paths';
-import { logger } from '@/core/utils/logger';
+import { projectSrcDirPath } from '../../constants/paths';
+import { logger } from '../../utils/logger';
 
 interface AutoImportsOptions {
-    dts: string;
     globs: string[];
     imports: Import[];
 }
 
 // Constants
-const defaultDtsFilePath = 'core/.generated/auto-imports.d.ts';
 const dtsFileHeader = `
 /* eslint-disable */
 // @ts-nocheck
@@ -46,22 +42,16 @@ export function autoImports(options: Partial<AutoImportsOptions>) {
         name: 'auto-imports',
         async setup(builder: PluginBuilder) {
             const resolvedOptions: AutoImportsOptions = {
-                dts: defaultDtsFilePath,
                 globs: [],
                 imports: [],
                 ...options,
             };
 
             // Normalize imports
-            const normalizedImports = resolvedOptions.imports.map((importDef) => {
-                let from = importDef.from;
-                if (from.startsWith('@/')) from = join(projectSrcDirPath, from.slice(2));
-                else if (!isAbsolute(from)) from = resolve(projectSrcDirPath, from);
-                return {
-                    ...importDef,
-                    from,
-                };
-            });
+            const normalizedImports = resolvedOptions.imports.map((importDef) => ({
+                ...importDef,
+                from: resolvePath(importDef.from),
+            }));
 
             // Collect all valid source files from the provided glob patterns for export analysis
             const matchedFiles = await collectMatchedFiles(resolvedOptions.globs);
@@ -75,12 +65,15 @@ export function autoImports(options: Partial<AutoImportsOptions>) {
             const unimport = createUnimport({ imports });
 
             // Write dts file
-            await writeDtsFile(resolvedOptions.dts, unimport);
+            await Bun.write(
+                join(projectSrcDirPath, 'core/.generated/auto-imports.d.ts'),
+                `${dtsFileHeader}${await unimport.generateTypeDeclarations()}\n`,
+            );
 
             // Register bun plugin if any imports, otherwise skip
             if (!imports.length) return;
             builder.onLoad(
-                { filter: /\.(cjs|js|mjs|ts)$/i },
+                { filter: new RegExp(`${escapeRegExp(projectSrcDirPath)}.*\\.(cjs|js|mjs|ts)$`, 'i') },
                 async ({ path }) => {
                     const fileContent = await Bun.file(path).text();
                     const transformedFileContent = await unimport.injectImports(fileContent);
@@ -100,7 +93,7 @@ async function collectMatchedFiles(globPatterns: string[]) {
     const matchedFiles = new Set<string>();
     await Promise.all(
         globPatterns.filter(isAllowedFile).map(async (pattern) => {
-            const scanner = new Glob(pattern).scan({
+            const scanner = new Glob(resolvePath(pattern)).scan({
                 absolute: true,
                 cwd: projectSrcDirPath,
                 onlyFiles: true,
@@ -152,16 +145,8 @@ async function parseExportsToImports(files: Set<string>) {
     return resolvedImports;
 }
 
-async function writeDtsFile(dtsFilePath: string, unimport: Unimport) {
-    let resolvedDtsFilePath = dtsFilePath;
-    if (resolvedDtsFilePath.startsWith('@/')) {
-        resolvedDtsFilePath = join(projectSrcDirPath, resolvedDtsFilePath.slice(2));
-    } else if (!isAbsolute(resolvedDtsFilePath)) resolvedDtsFilePath = resolve(projectSrcDirPath, resolvedDtsFilePath);
-    await Bun.write(resolvedDtsFilePath, `${dtsFileHeader}${await unimport.generateTypeDeclarations()}\n`);
-    if (dtsFilePath !== defaultDtsFilePath) {
-        await Bun.write(
-            join(projectSrcDirPath, defaultDtsFilePath),
-            `/// <reference path="${resolvedDtsFilePath}" />\n`,
-        );
-    }
+function resolvePath(path: string) {
+    if (path.startsWith('@/')) return join(projectSrcDirPath, path.slice(2));
+    else if (!isAbsolute(path)) return resolve(projectSrcDirPath, path);
+    return path;
 }
