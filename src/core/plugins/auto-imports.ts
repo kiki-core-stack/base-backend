@@ -28,6 +28,7 @@ interface AutoImportsOptions {
 }
 
 // Constants
+const defaultDtsFilePath = 'core/.generated/auto-imports.d.ts';
 const dtsFileHeader = `
 /* eslint-disable */
 // @ts-nocheck
@@ -35,7 +36,7 @@ const dtsFileHeader = `
 // ⚠️ AUTO-GENERATED FILE. DO NOT EDIT MANUALLY.
 // This file is excluded from Git via .gitignore.
 
-`;
+`.trimStart();
 
 // Functions
 export const isAllowedFile = (filePath: string) => !filePath.endsWith('.d.ts') && !filePath.includes('node_modules');
@@ -45,7 +46,7 @@ export function autoImports(options: Partial<AutoImportsOptions>) {
         name: 'auto-imports',
         async setup(builder: PluginBuilder) {
             const resolvedOptions: AutoImportsOptions = {
-                dts: join(projectSrcDirPath, 'core/.generated/auto-imports.d.ts'),
+                dts: defaultDtsFilePath,
                 globs: [],
                 imports: [],
                 ...options,
@@ -69,7 +70,7 @@ export function autoImports(options: Partial<AutoImportsOptions>) {
             // Only include named exports and named star exports; skip default exports and type declarations
             const resolvedImports = await parseExportsToImports(matchedFiles);
 
-            // Create a new unimport context to handle auto-import resolution
+            // Create a new unimport context to handle auto-imports resolution
             const imports = resolvedImports.concat(normalizedImports);
             const unimport = createUnimport({ imports });
 
@@ -152,5 +153,15 @@ async function parseExportsToImports(files: Set<string>) {
 }
 
 async function writeDtsFile(dtsFilePath: string, unimport: Unimport) {
-    await Bun.write(dtsFilePath, `${dtsFileHeader}${await unimport.generateTypeDeclarations()}\n`);
+    let resolvedDtsFilePath = dtsFilePath;
+    if (resolvedDtsFilePath.startsWith('@/')) {
+        resolvedDtsFilePath = join(projectSrcDirPath, resolvedDtsFilePath.slice(2));
+    } else if (!isAbsolute(resolvedDtsFilePath)) resolvedDtsFilePath = resolve(projectSrcDirPath, resolvedDtsFilePath);
+    await Bun.write(resolvedDtsFilePath, `${dtsFileHeader}${await unimport.generateTypeDeclarations()}\n`);
+    if (dtsFilePath !== defaultDtsFilePath) {
+        await Bun.write(
+            join(projectSrcDirPath, defaultDtsFilePath),
+            `/// <reference path="${resolvedDtsFilePath}" />\n`,
+        );
+    }
 }
