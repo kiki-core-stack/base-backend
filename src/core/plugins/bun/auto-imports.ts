@@ -17,7 +17,7 @@ import { createUnimport } from 'unimport';
 import type { Import } from 'unimport';
 
 import { projectSrcDirPath } from '../../constants/paths';
-import { logger } from '../../utils/logger';
+import { logger } from '../../globals/logger';
 
 interface AutoImportsOptions {
     globs: string[];

@@ -3,7 +3,7 @@ import { rm } from 'node:fs/promises';
 import productionPlugins from '@/plugins/bun/production';
 
 import { projectDistDirPath } from './constants/paths';
-import { logger } from './utils/logger';
+import { logger } from './globals/logger';
 
 logger.info('Cleaning output directory...');
 await rm(

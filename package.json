@@ -4,7 +4,7 @@
   "scripts": {
     "build": "NODE_ENV=production bun run ./src/core/build.ts",
     "depcheck": "depcheck",
-    "dev": "cross-env NODE_ENV=development bun --env-file=./.env.development.local --watch run ./src/index.ts",
+    "dev": "cross-env NODE_ENV=development bun --env-file=./.env.development.local --watch run ./src/core/dev-entrypoint.ts",
     "lint": "eslint --max-warnings 0",
     "lint:fix": "eslint --fix --max-warnings 0",
     "typecheck": "tsc",
