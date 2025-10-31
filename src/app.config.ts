@@ -11,6 +11,7 @@ export default {
         autoImports({
             globs: [],
             imports: [
+                // Default imports
                 {
                     from: '@/core/app.ts',
                     name: 'defineRouteHandlers',
