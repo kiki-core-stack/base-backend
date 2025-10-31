@@ -1,9 +1,21 @@
 import type { BunPlugin } from 'bun';
 
-import { autoImports } from '@/core/plugins/auto-import';
+import { autoImports } from '@/core/plugins/auto-imports';
 
 interface AppConfig {
     plugins: BunPlugin[];
 }
 
-export default { plugins: [autoImports({ globs: [] })] } satisfies AppConfig;
+export default {
+    plugins: [
+        autoImports({
+            globs: [],
+            imports: [
+                {
+                    from: '@/core/app.ts',
+                    name: 'defineRouteHandlers',
+                },
+            ],
+        }),
+    ],
+} satisfies AppConfig;

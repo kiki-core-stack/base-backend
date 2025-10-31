@@ -16,7 +16,6 @@ import { createUnimport } from 'unimport';
 import type {
     Import,
     Unimport,
-
 } from 'unimport';
 
 import { projectSrcDirPath } from '@/core/constants/paths';
