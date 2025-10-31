@@ -2,63 +2,90 @@ stages:
   - check
   # - release
 
-before_script:
-  - echo '[install.cache]' >~/.bunfig.toml
-  - echo 'dir = "./.cache/bun/install/cache"' >>~/.bunfig.toml
-
 # Anchors
 
-.base-job: &base-job
-  image: oven/bun:alpine
+.bun-cache: &bun-cache
   cache:
     key: bun-cache
     paths:
       - ./.cache/bun/install/cache
 
-.base-check-job: &base-check-job
-  <<: *base-job
-  stage: check
-  rules:
-    - if: $CI_MERGE_REQUEST_TARGET_BRANCH_NAME =~ /^(dev|main)$/
-      when: always
-    - when: never
+.setup-bun-and-install-dependencies: &setup-bun-and-install-dependencies
+  - |
+    echo '[install.cache]' >~/.bunfig.toml
+    echo 'dir = "./.cache/bun/install/cache"' >>~/.bunfig.toml
+  - bun i --frozen-lockfile
 
 # Jobs
 
 # stage: check
 lint:
-  <<: *base-check-job
+  stage: check
+  image: oven/bun:alpine
+
+  rules:
+    - if: $CI_MERGE_REQUEST_TARGET_BRANCH_NAME =~ /^(dev|main)$/
+      when: always
+    - when: never
+
+  <<: *bun-cache
+
+  before_script: *setup-bun-and-install-dependencies
+
   script:
-    - bun i --frozen-lockfile
     - bun run lint
 
 # stage: check
 typecheck:
-  <<: *base-check-job
+  stage: check
+  image: oven/bun:alpine
+
+  rules:
+    - if: $CI_MERGE_REQUEST_TARGET_BRANCH_NAME =~ /^(dev|main)$/
+      when: always
+    - when: never
+
+  <<: *bun-cache
+
+  before_script: *setup-bun-and-install-dependencies
+
   script:
-    - bun i --frozen-lockfile
     - bun run typecheck
 
 # stage: check
 build:
-  <<: *base-check-job
+  stage: check
+  image: oven/bun:alpine
+
+  rules:
+    - if: $CI_MERGE_REQUEST_TARGET_BRANCH_NAME =~ /^(dev|main)$/
+      when: always
+    - when: never
+
+  <<: *bun-cache
+
+  before_script: *setup-bun-and-install-dependencies
+
   script:
-    - bun i --frozen-lockfile
     - bun run build
 
 # stage: release
 # release:
-#   <<: *base-job
 #   stage: release
-#   script:
+#   image: node:24-alpine
+
+#   only:
+#     - main
+
+#   before_script:
 #     - apk update && apk upgrade && apk add git
 #     - |
-#       bun i -fg \
+#       npm i -g \
 #         semantic-release@latest \
 #         @semantic-release/changelog@latest \
 #         @semantic-release/git@latest \
 #         @semantic-release/gitlab@latest \
 #         conventional-changelog-conventionalcommits@latest
+
+#   script:
 #     - semantic-release
-#   only:
-#     - main
