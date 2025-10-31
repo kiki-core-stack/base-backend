@@ -188,3 +188,4 @@ upgrade-dependencies.sh
 
 # Generated files
 src/core/.generated/
+src/core/loaders/routes/production.ts

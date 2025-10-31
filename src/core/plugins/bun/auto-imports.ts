@@ -48,9 +48,9 @@ export function autoImports(options: Partial<AutoImportsOptions>) {
             };
 
             // Normalize imports
-            const normalizedImports = resolvedOptions.imports.map((importDef) => ({
-                ...importDef,
-                from: resolvePath(importDef.from),
+            const normalizedImports = resolvedOptions.imports.map((importDefinition) => ({
+                ...importDefinition,
+                from: resolvePath(importDefinition.from),
             }));
 
             // Collect all valid source files from the provided glob patterns for export analysis

@@ -18,7 +18,7 @@ await rm(
     },
 );
 
-// await import('./production-loader-generators/routes');
+await import('./production-loader-generators/routes');
 
 logger.info('Starting build...');
 await Bun.build({
