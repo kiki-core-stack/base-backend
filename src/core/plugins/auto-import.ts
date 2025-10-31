@@ -5,7 +5,11 @@ import type {
     Loader,
     PluginBuilder,
 } from 'bun';
-import { join } from 'node:path';
+import {
+    isAbsolute,
+    join,
+    resolve,
+} from 'node:path';
 
 import { findExports } from 'mlly';
 import { createUnimport } from 'unimport';
@@ -16,6 +20,7 @@ import type {
 } from 'unimport';
 
 import { projectSrcDirPath } from '@/core/constants/paths';
+import { logger } from '@/core/utils/logger';
 
 interface AutoImportsOptions {
     dts: string;
@@ -47,6 +52,17 @@ export function autoImports(options: Partial<AutoImportsOptions>) {
                 ...options,
             };
 
+            // Normalize imports
+            const normalizedImports = resolvedOptions.imports.map((importDef) => {
+                let from = importDef.from;
+                if (from.startsWith('@/')) from = join(projectSrcDirPath, from.slice(2));
+                else if (!isAbsolute(from)) from = resolve(projectSrcDirPath, from);
+                return {
+                    ...importDef,
+                    from,
+                };
+            });
+
             // Collect all valid source files from the provided glob patterns for export analysis
             const matchedFiles = await collectMatchedFiles(resolvedOptions.globs);
 
@@ -55,20 +71,16 @@ export function autoImports(options: Partial<AutoImportsOptions>) {
             const resolvedImports = await parseExportsToImports(matchedFiles);
 
             // Create a new unimport context to handle auto-import resolution
-            const unimport = createUnimport({
-                imports: [
-                    ...resolvedImports,
-                    ...resolvedOptions.imports,
-                ],
-            });
+            const imports = resolvedImports.concat(normalizedImports);
+            const unimport = createUnimport({ imports });
 
             // Write dts file
             await writeDtsFile(resolvedOptions.dts, unimport);
 
             // Register bun plugin if any imports, otherwise skip
-            if (!resolvedImports.length) return;
+            if (!imports.length) return;
             builder.onLoad(
-                { filter: /\.cjs|js|mjs|ts$/i },
+                { filter: /\.(cjs|js|mjs|ts)$/i },
                 async ({ path }) => {
                     const fileContent = await Bun.file(path).text();
                     const transformedFileContent = await unimport.injectImports(fileContent);
@@ -78,6 +90,8 @@ export function autoImports(options: Partial<AutoImportsOptions>) {
                     };
                 },
             );
+
+            logger.info(`[auto-imports] ${imports.length} imports resolved`);
         },
     };
 }
@@ -93,7 +107,8 @@ async function collectMatchedFiles(globPatterns: string[]) {
             });
 
             for await (const filePath of scanner) {
-                if (isAllowedFile(filePath) && /\.cjs|js|mjs|ts$/i.test(filePath)) matchedFiles.add(filePath);
+                // eslint-disable-next-line regexp/no-unused-capturing-group
+                if (isAllowedFile(filePath) && /\.(cjs|js|mjs|ts)$/i.test(filePath)) matchedFiles.add(filePath);
             }
         }),
     );
@@ -137,6 +152,6 @@ async function parseExportsToImports(files: Set<string>) {
     return resolvedImports;
 }
 
-async function writeDtsFile(dtdFilePath: string, unimport: Unimport) {
-    await Bun.write(dtdFilePath, `${dtsFileHeader}${await unimport.generateTypeDeclarations()}\n`);
+async function writeDtsFile(dtsFilePath: string, unimport: Unimport) {
+    await Bun.write(dtsFilePath, `${dtsFileHeader}${await unimport.generateTypeDeclarations()}\n`);
 }
