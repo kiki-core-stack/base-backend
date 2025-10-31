@@ -185,3 +185,6 @@ tmux-run-dev.sh
 upgrade-dependencies.sh
 
 ### Custom ###
+
+# Generated files
+src/core/.generated/
