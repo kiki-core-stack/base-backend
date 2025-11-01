@@ -11,26 +11,27 @@
     "unused-exports": "ts-unused-exports ./tsconfig.json"
   },
   "dependencies": {
-    "@asteasolutions/zod-to-openapi": "^8.0.0",
-    "@kiki-core-stack/pack": "^0.76.0",
-    "@kikiutils/mongoose": "^3.3.0",
+    "@asteasolutions/zod-to-openapi": "^8.1.0",
+    "@kiki-core-stack/pack": "^0.82.2",
+    "@kikiutils/mongoose": "^6.1.1",
     "consola": "^3.4.2",
-    "hono": "^4.8.5",
-    "node-ciphers": "^4.0.4",
+    "hono": "^4.9.8",
+    "ioredis": "^5.7.0",
+    "node-ciphers": "^6.1.2",
     "on-change": "^5.0.1",
-    "zod": "^4.0.5"
+    "zod": "^4.1.9"
   },
   "devDependencies": {
     "@hono/swagger-ui": "^0.5.2",
-    "@kikiutils/eslint-config": "^1.2.7",
-    "@kikiutils/tsconfigs": "^5.0.4",
-    "@scalar/hono-api-reference": "^0.9.12",
-    "@types/bun": "^1.2.19",
+    "@kikiutils/eslint-config": "^3.0.1",
+    "@kikiutils/tsconfigs": "^5.0.5",
+    "@scalar/hono-api-reference": "^0.9.18",
+    "@types/bun": "^1.2.22",
     "depcheck": "^1.4.7",
-    "mlly": "^1.7.4",
+    "mlly": "^1.8.0",
     "openapi3-ts": "^4.5.0",
     "ts-unused-exports": "^11.0.1",
-    "type-fest": "^4.41.0",
-    "typescript": "^5.8.3"
+    "type-fest": "^5.0.1",
+    "typescript": "^5.9.2"
   }
 }
