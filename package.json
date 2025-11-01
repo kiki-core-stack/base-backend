@@ -26,7 +26,6 @@
     "cross-env": "^10.1.0",
     "depcheck": "^1.4.7",
     "mlly": "^1.8.0",
-    "rimraf": "^6.1.0",
     "ts-unused-exports": "^11.0.1",
     "type-fest": "^5.1.0",
     "typescript": "^5.9.3",
