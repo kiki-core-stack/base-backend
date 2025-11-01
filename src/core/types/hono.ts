@@ -1,6 +1,6 @@
 import type { H } from 'hono/types';
 
-import type { RouteHandlerProperties } from '@/core/types/route';
+import type { RouteHandlerProperties } from './route';
 
 declare module 'hono' {
     interface Context {

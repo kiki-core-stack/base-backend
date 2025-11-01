@@ -2,8 +2,6 @@ import type { Subprocess } from 'bun';
 
 import { colorize } from 'consola/utils';
 
-import { logger } from '@/core/utils/logger';
-
 interface WorkerProcess {
     logPrefix: string;
     subprocess: Subprocess<'inherit', 'inherit', 'inherit'>;

@@ -13,4 +13,4 @@ if [ -d /run/secrets ]; then
 fi
 
 # Run the app
-exec bun run ./production-entrypoint.js
+exec bun run ./core/entrypoints/production.js

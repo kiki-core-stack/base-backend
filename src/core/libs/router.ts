@@ -11,26 +11,13 @@ import {
 import type {
     RouteDefinition,
     RouteHandlerOptions,
+    RouteHttpMethod,
 } from '../types/route';
 
-import type { RouteZodOpenApiConfig } from './zod-openapi';
+// Functions
+export const normalizeRouteHandlers = (handlers: any) => [handlers].flat().filter((handler) => handler !== undefined);
 
-export const processRouteHandlers = (handlers: any) => [handlers].flat().filter((handler) => handler !== undefined);
-
-function filePathSegmentToRankValue(segment: string, isLast: boolean) {
-    if (segment === '*' && isLast) return 1e12;
-    if (segment === '*') return 1e10;
-    if (segment.startsWith(':') && segment.includes('.')) return 11;
-    if (segment.startsWith(':')) return 111;
-    return 1;
-}
-
-function filePathToRank(path: string) {
-    const segments = path.split('/');
-    return +segments.map((segment, i) => filePathSegmentToRankValue(segment, i === segments.length - 1)).join('');
-}
-
-export async function getRouteDefinitions(): Promise<RouteDefinition[]> {
+export async function discoverRouteDefinitions(): Promise<RouteDefinition[]> {
     const envSuffix = process.env.NODE_ENV === 'production' ? 'prod' : 'dev';
     const filePattern = new RegExp(
         `^${routesDirPath}(.*?)(/index)?\\.(${allowedRouteHttpMethods.join('|')})(\\.${envSuffix})?\\.(mj|t)s$`,
@@ -52,12 +39,24 @@ export async function getRouteDefinitions(): Promise<RouteDefinition[]> {
     return routeDefinitions.sort((a, b) => filePathToRank(a.path) - filePathToRank(b.path));
 }
 
-export async function registerRoute(
-    method: typeof allowedRouteHttpMethods[number],
+function filePathSegmentToRankValue(segment: string, isLast: boolean) {
+    if (segment === '*' && isLast) return 1e12;
+    if (segment === '*') return 1e10;
+    if (segment.startsWith(':') && segment.includes('.')) return 11;
+    if (segment.startsWith(':')) return 111;
+    return 1;
+}
+
+function filePathToRank(path: string) {
+    const segments = path.split('/');
+    return +segments.map((segment, i) => filePathSegmentToRankValue(segment, i === segments.length - 1)).join('');
+}
+
+export function registerRoute(
+    method: RouteHttpMethod,
     path: string,
     handlers: any[],
     handlerOptions?: RouteHandlerOptions,
-    zodOpenApiOptions?: { config: RouteZodOpenApiConfig; path: string },
 ) {
     const latestHandler = handlers[handlers.length - 1];
 
@@ -75,15 +74,4 @@ export async function registerRoute(
 
     honoApp.on(method, path, ...handlers);
     (allRoutes as WritableDeep<typeof allRoutes>)[method][path] = { handlerProperties: handlerOptions?.properties };
-
-    // Remove the next line if you need OpenAPI metadata in production.
-    if (process.env.NODE_ENV === 'production') return;
-    if (zodOpenApiOptions) {
-        const { zodOpenApiRegistry } = await import('../constants/zod-openapi');
-        zodOpenApiRegistry.registerPath({
-            ...zodOpenApiOptions.config,
-            method,
-            path: zodOpenApiOptions.path,
-        });
-    }
 }

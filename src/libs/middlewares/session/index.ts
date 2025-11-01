@@ -1,9 +1,8 @@
 import type { BinaryLike } from 'node:crypto';
 
+import { createMiddleware } from 'hono/factory';
 import { Gcm } from 'node-ciphers/aes';
 import onChange from 'on-change';
-
-import { defaultHonoFactory } from '@/core/constants/hono';
 
 import {
     sessionChangedSymbol,
@@ -31,7 +30,7 @@ export function session(cipherKey: BinaryLike, tokenHandler: SessionTokenHandler
         },
     );
 
-    return defaultHonoFactory.createMiddleware(async (ctx, next) => {
+    return createMiddleware(async (ctx, next) => {
         let sessionData = {};
         const sessionToken = tokenHandler.get(ctx);
         if (sessionToken) {
