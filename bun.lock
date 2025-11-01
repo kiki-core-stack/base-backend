@@ -6,6 +6,7 @@
         "@hono/zod-validator": "^0.7.4",
         "@kiki-core-stack/pack": "^0.84.1",
         "@kikiutils/mongoose": "^6.2.0",
+        "@kikiutils/shared": "^13.5.2",
         "consola": "^3.4.2",
         "es-toolkit": "^1.41.0",
         "hono": "^4.10.4",
@@ -124,6 +125,8 @@
 
     "@kikiutils/mongoose": ["@kikiutils/mongoose@6.2.0", "", { "dependencies": { "decimal.js": "^10.6.0", "es-toolkit": "^1.39.10", "mongoose": "^8.19.1", "mongoose-aggregate-paginate-v2": "^1.1.4", "mongoose-paginate-v2": "^1.9.1", "type-fest": "^5.0.1" } }, "sha512-nMr9vhOMQ+ZNpnLBC1T5VtZqvyjwnGKTx3oMHvkjdWWeVETegTCd++HXG87gBF8BSG3VbzJZUXXxHgNC2v+mTw=="],
 
+    "@kikiutils/shared": ["@kikiutils/shared@13.5.2", "", { "peerDependencies": { "@noble/hashes": "^2.0.0", "@types/fs-extra": "^11.0.4", "@types/jsonfile": "^6.1.4", "@types/node": "^24.5.2", "@types/ssh2": "^1.15.5", "async-validator": "^4.2.5", "bson": "^6.10.4", "consola": "^3.4.2", "date-fns": "^4.1.0", "decimal.js": "^10.6.0", "element-plus": "^2.11.3", "fs-extra": "^11.3.2", "ioredis": "^5.7.0", "lru-cache": "^11.2.1", "millify": "^6.1.0", "node-ssh": "^13.2.1", "pino": "^10.0.0", "pino-pretty": "^13.1.1", "superjson": "^2.2.2", "vue": "^3.5.21", "vue-router": "^4.5.1" }, "optionalPeers": ["@noble/hashes", "@types/fs-extra", "@types/jsonfile", "@types/node", "@types/ssh2", "async-validator", "bson", "consola", "date-fns", "decimal.js", "element-plus", "fs-extra", "ioredis", "lru-cache", "millify", "node-ssh", "pino", "pino-pretty", "superjson", "vue", "vue-router"] }, "sha512-nMDR/8kCvu5kRmqsVxDtB9ER5y75T5kS75waDbHUXouHRPCe+aPIbxm0HTBblS/DbOQDAHxD+jowsTxnhvtIug=="],
+
     "@kikiutils/tsconfigs": ["@kikiutils/tsconfigs@5.0.5", "", {}, "sha512-WLdbS2BhXpZP/7ShvQELZ9PKGa0u9Vtl4QIH/Q2DAyRqWQtbdsR4tBaEihtCWVcmbrvBV9DlmYUZZ4QPCL3PSA=="],
 
     "@mongodb-js/saslprep": ["@mongodb-js/saslprep@1.3.2", "", { "dependencies": { "sparse-bitfield": "^3.0.3" } }, "sha512-QgA5AySqB27cGTXBFmnpifAi7HxoGUeezwo6p9dI03MuDB6Pp33zgclqVb6oVK3j6I9Vesg0+oojW2XxB59SGg=="],
@@ -232,7 +235,7 @@
 
     "balanced-match": ["balanced-match@1.0.2", "", {}, "sha512-3oSeUO0TMV67hN1AmbXsK4yaqU7tjiHlbxRDZOpH0KW9+CeX4bRAaX0Anxt0tx2MrpRpWwQaPwIlISEJhYU5Pw=="],
 
-    "baseline-browser-mapping": ["baseline-browser-mapping@2.8.22", "", { "bin": { "baseline-browser-mapping": "dist/cli.js" } }, "sha512-/tk9kky/d8T8CTXIQYASLyhAxR5VwL3zct1oAoVTaOUHwrmsGnfbRwNdEq+vOl2BN8i3PcDdP0o4Q+jjKQoFbQ=="],
+    "baseline-browser-mapping": ["baseline-browser-mapping@2.8.23", "", { "bin": { "baseline-browser-mapping": "dist/cli.js" } }, "sha512-616V5YX4bepJFzNyOfce5Fa8fDJMfoxzOIzDCZwaGL8MKVpFrXqfNUoIpRn9YMI5pXf/VKgzjB4htFMsFKKdiQ=="],
 
     "binary-extensions": ["binary-extensions@2.3.0", "", {}, "sha512-Ceh+7ox5qe7LJuLHoY0feh3pHuUDHAcRUeyL2VYghZwfpkNIy/+8Ocg0a3UuSoYzavmylwuLWQOf3hl0jjMMIw=="],
 
