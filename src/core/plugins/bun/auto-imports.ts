@@ -104,6 +104,43 @@ export function autoImports(options: Partial<AutoImportsOptions>) {
     };
 }
 
+async function collectFileExportsRecursively(filePath: string, visitedFiles: Set<string>) {
+    if (visitedFiles.has(filePath)) return [];
+    visitedFiles.add(filePath);
+
+    const resolvedImports: Import[] = [];
+    await Promise.all(
+        findExports(await Bun.file(filePath).text()).map(async (esmExport) => {
+            switch (esmExport.type) {
+                case 'declaration':
+                case 'named':
+                    esmExport.names.forEach((name) => {
+                        resolvedImports.push({
+                            declarationType: esmExport.declarationType,
+                            from: filePath,
+                            name,
+                        });
+                    });
+
+                    break;
+                case 'star': {
+                    resolvedImports.push(
+                        ...await resolveStarEsmExportToImportsRecursively(
+                            filePath,
+                            esmExport,
+                            visitedFiles,
+                        ),
+                    );
+
+                    break;
+                }
+            }
+        }),
+    );
+
+    return resolvedImports;
+}
+
 async function collectMatchedFiles(globPatterns: string[]) {
     const matchedFiles = new Set<string>();
     await Promise.all(
@@ -127,39 +164,15 @@ async function collectMatchedFiles(globPatterns: string[]) {
 }
 
 async function extractExportsAsImports(files: Set<string>) {
-    const resolvedImports: Import[] = [];
-    await Promise.all(
-        [...files].map(async (filePath) => {
-            const fileContent = await Bun.file(filePath).text();
-            await Promise.all(
-                findExports(fileContent).map(async (esmExport) => {
-                    switch (esmExport.type) {
-                        case 'declaration':
-                        case 'named':
-                            esmExport.names.forEach((name) => {
-                                resolvedImports.push({
-                                    declarationType: esmExport.declarationType,
-                                    from: filePath,
-                                    name,
-                                });
-                            });
-
-                            break;
-                        case 'star': {
-                            const resolvedImport = await resolveStarEsmExportToImport(filePath, esmExport);
-                            if (resolvedImport) resolvedImports.push(resolvedImport);
-                            break;
-                        }
-                    }
-                }),
-            );
-        }),
-    );
-
-    return resolvedImports;
+    const visitedFiles = new Set<string>();
+    return (
+        await Promise.all(
+            [...files].map(async (filePath) => await collectFileExportsRecursively(filePath, visitedFiles)),
+        )
+    ).flat();
 }
 
-export function isEligibleSourceFile(filePath: string) {
+function isEligibleSourceFile(filePath: string) {
     return !filePath.endsWith('.d.ts') && !filePath.includes('node_modules');
 }
 
@@ -169,28 +182,30 @@ function resolveImportPath(path: string) {
     return path;
 }
 
-async function resolveStarEsmExportToImport(filePath: string, esmExport: ESMExport): Promise<Import | undefined> {
-    if (!esmExport.name || !esmExport.specifier) return;
+async function resolveStarEsmExportToImportsRecursively(
+    filePath: string,
+    esmExport: ESMExport,
+    visitedFiles: Set<string>,
+) {
+    if (!esmExport.specifier) return [];
 
-    // External package
+    const resolvedImports: Import[] = [];
+    let specifier = esmExport.specifier;
     // eslint-disable-next-line regexp/no-unused-capturing-group
-    if (!/^([./]|@\/)/.test(esmExport.specifier)) {
-        return {
-            as: esmExport.name,
-            declarationType: esmExport.declarationType,
-            from: esmExport.specifier,
-            name: '*',
-        };
+    if (/^([./]|@\/)/.test(specifier)) {
+        if (specifier.startsWith('@/')) specifier = join(projectSrcDirPath, specifier.substring(2));
+        else if (!isAbsolute(specifier)) specifier = resolve(dirname(filePath), specifier);
     }
 
-    // Local file
-    let specifier = esmExport.specifier;
-    if (esmExport.specifier.startsWith('@/')) specifier = join(projectSrcDirPath, specifier.substring(2));
-    else if (!isAbsolute(specifier)) specifier = resolve(dirname(filePath), specifier);
-    return {
-        as: esmExport.name,
-        declarationType: esmExport.declarationType,
-        from: await mllyResolvePath(specifier, { extensions: allowedExtensions }),
-        name: '*',
-    };
+    specifier = await mllyResolvePath(specifier, { extensions: allowedExtensions });
+    if (!esmExport.name) resolvedImports.push(...await collectFileExportsRecursively(specifier, visitedFiles));
+    else {
+        resolvedImports.push({
+            as: esmExport.name,
+            from: specifier,
+            name: '*',
+        });
+    }
+
+    return resolvedImports;
 }
