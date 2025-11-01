@@ -2,7 +2,7 @@ import { plugin as registerPlugin } from 'bun';
 
 import bunPlugins from '@/plugins/bun/development';
 
-import { logger } from '../globals/logger';
+import * as logger from '../utils/logger';
 
 // Load bun plugins
 logger.info('Loading bun plugins...');

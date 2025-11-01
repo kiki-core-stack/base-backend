@@ -1,9 +1,9 @@
 import { resolveModuleExportNames } from 'mlly';
 
 import { productionRoutesLoaderPath } from '../../constants/paths';
-import { logger } from '../../globals/logger';
 import { discoverRouteDefinitions } from '../../libs/router';
 import type { RouteDefinition } from '../../types/route';
+import * as logger from '../../utils/logger';
 
 // Constants
 const importStatements: string[] = [];

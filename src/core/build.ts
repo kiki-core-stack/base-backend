@@ -7,7 +7,7 @@ import {
     projectDistDirPath,
     projectSrcDirPath,
 } from './constants/paths';
-import { logger } from './globals/logger';
+import * as logger from './utils/logger';
 
 logger.info('Cleaning output directory...');
 await rm(

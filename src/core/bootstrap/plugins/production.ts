@@ -1,6 +1,6 @@
 import { plugin as registerPlugin } from 'bun';
 
-import { logger } from '../../globals/logger';
+import * as logger from '../../utils/logger';
 
 // Load bun plugins
 logger.info('Loading bun plugins...');
