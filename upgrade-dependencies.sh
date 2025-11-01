@@ -10,5 +10,5 @@ export NPM_CONFIG_REGISTRY
 
 [[ " $@ " =~ ' -c ' ]] && rm -rf ./bun.lock ./node_modules
 
-bun update
+bun update --latest
 ./modify-files-permissions.sh
