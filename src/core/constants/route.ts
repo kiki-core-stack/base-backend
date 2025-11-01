@@ -1,6 +1,9 @@
 import type { ReadonlyDeep } from 'type-fest';
 
-import type { Route } from '../types/route';
+import type {
+    Route,
+    RouteHttpMethod,
+} from '../types/route';
 
 export const allowedRouteHttpMethods = [
     'delete',
@@ -12,7 +15,7 @@ export const allowedRouteHttpMethods = [
     'put',
 ] as const;
 
-export const allRoutes: ReadonlyDeep<Record<typeof allowedRouteHttpMethods[number], Record<string, Route>>> = {
+export const allRoutes: ReadonlyDeep<Record<RouteHttpMethod, Record<string, Route>>> = {
     delete: {},
     get: {},
     head: {},

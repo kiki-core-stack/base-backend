@@ -1,7 +1,5 @@
 import type { Server } from 'bun';
 
-import { logger } from '@/core/utils/logger';
-
 let isGracefulExitStarted = false;
 
 export async function gracefulExit(server?: Server<any>) {

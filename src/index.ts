@@ -1,16 +1,14 @@
 import type { Server } from 'bun';
 
 import { honoApp } from '@/core/app';
-import { logger } from '@/core/utils/logger';
 import { gracefulExit } from '@/graceful-exit';
 
+// Constants/Variables
 let server: Server<any> | undefined;
+
+// Register exit signals
 process.on('SIGINT', () => gracefulExit(server));
 process.on('SIGTERM', () => gracefulExit(server));
-
-// Import environment-specific runtime initializers.
-// Used for applying side effects like dev-only tooling, schema extensions, etc.
-await import(`@/core/runtime-inits/${process.env.NODE_ENV}`);
 
 // Load middlewares
 await import('@/middlewares');

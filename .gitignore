@@ -163,5 +163,6 @@ v8-compile-cache*/
 
 ### Custom ###
 
-# Generated production loaders
+# Generated files
+src/core/.generated/
 src/core/loaders/routes/production.ts

@@ -21,6 +21,7 @@ RUN --mount=id=bun-cache,target=/root/.bun/install/cache,type=cache \
 COPY ./.env.production.local ./.gitignore ./eslint.config.mjs ./tsconfig.json ./
 COPY ./src ./src
 RUN bun run lint && \
+    bun run bootstrap:prod && \
     bun run typecheck && \
     bun run build
 
