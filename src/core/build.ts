@@ -1,7 +1,7 @@
 import { rm } from 'node:fs/promises';
 import { join } from 'node:path';
 
-import productionPlugins from '@/plugins/bun/production';
+import bunProductionPlugins from '@/plugins/bun/production';
 
 import {
     projectDistDirPath,
@@ -18,7 +18,8 @@ await rm(
     },
 );
 
-await import('./production-loader-generators/routes');
+// Generate routes
+await import('./generators/routes/production');
 
 logger.info('Starting build...');
 await Bun.build({
@@ -28,7 +29,7 @@ await Bun.build({
     ],
     minify: true,
     outdir: projectDistDirPath,
-    plugins: productionPlugins,
+    plugins: bunProductionPlugins,
     splitting: true,
     target: 'bun',
 });

@@ -7,9 +7,4 @@ export const autoImports = autoImportsPlugin({
 
         // Add your own settings here.
     ],
-    imports: [
-        // The default settings are generally safe to use; you won't need to modify them here.
-
-        // Add your own settings here.
-    ],
 });
