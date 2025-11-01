@@ -6,13 +6,18 @@ import type {
     PluginBuilder,
 } from 'bun';
 import {
+    dirname,
     isAbsolute,
     join,
     resolve,
 } from 'node:path';
 
 import { escapeRegExp } from 'es-toolkit';
-import { findExports } from 'mlly';
+import {
+    findExports,
+    resolvePath as mllyResolvePath,
+} from 'mlly';
+import type { ESMExport } from 'mlly';
 import { createUnimport } from 'unimport';
 import type { Import } from 'unimport';
 
@@ -25,8 +30,15 @@ interface AutoImportsOptions {
 }
 
 // Constants
+const allowedExtensions = [
+    '.ts',
+    '.mjs',
+    '.cjs',
+    '.js',
+];
+
+const allowedExtensionsRegexpString = `(${allowedExtensions.map(escapeRegExp).join('|')})`;
 const dtsFileHeader = `
-/* eslint-disable */
 // @ts-nocheck
 // prettier-ignore
 // ⚠️ AUTO-GENERATED FILE. DO NOT EDIT MANUALLY.
@@ -35,11 +47,9 @@ const dtsFileHeader = `
 `.trimStart();
 
 // Functions
-export const isAllowedFile = (filePath: string) => !filePath.endsWith('.d.ts') && !filePath.includes('node_modules');
-
 export function autoImports(options: Partial<AutoImportsOptions>) {
     return {
-        name: 'auto-imports',
+        name: 'bun-auto-imports',
         async setup(builder: PluginBuilder) {
             const resolvedOptions: AutoImportsOptions = {
                 globs: [],
@@ -47,24 +57,24 @@ export function autoImports(options: Partial<AutoImportsOptions>) {
                 ...options,
             };
 
-            // Normalize imports
+            // Normalize explicit imports
             const normalizedImports = resolvedOptions.imports.map((importDefinition) => ({
                 ...importDefinition,
-                from: resolvePath(importDefinition.from),
+                from: resolveImportPath(importDefinition.from),
             }));
 
-            // Collect all valid source files from the provided glob patterns for export analysis
+            // Collect and parse source files
             const matchedFiles = await collectMatchedFiles(resolvedOptions.globs);
 
             // Parse each matched file with mlly.findExports() to extract export symbols
             // Only include named exports and named star exports; skip default exports and type declarations
-            const resolvedImports = await parseExportsToImports(matchedFiles);
+            const parsedImports = await extractExportsAsImports(matchedFiles);
 
             // Create a new unimport context to handle auto-imports resolution
-            const imports = resolvedImports.concat(normalizedImports);
+            const imports = parsedImports.concat(normalizedImports);
             const unimport = createUnimport({ imports });
 
-            // Write dts file
+            // Generate .d.ts file
             await Bun.write(
                 join(projectSrcDirPath, 'core/.generated/auto-imports.d.ts'),
                 `${dtsFileHeader}${await unimport.generateTypeDeclarations()}\n`,
@@ -73,7 +83,12 @@ export function autoImports(options: Partial<AutoImportsOptions>) {
             // Register bun plugin if any imports, otherwise skip
             if (!imports.length) return;
             builder.onLoad(
-                { filter: new RegExp(`${escapeRegExp(projectSrcDirPath)}.*\\.(cjs|js|mjs|ts)$`, 'i') },
+                {
+                    filter: new RegExp(
+                        `${escapeRegExp(projectSrcDirPath)}.*${allowedExtensionsRegexpString}$`,
+                        'i',
+                    ),
+                },
                 async ({ path }) => {
                     const fileContent = await Bun.file(path).text();
                     const transformedFileContent = await unimport.injectImports(fileContent);
@@ -92,16 +107,18 @@ export function autoImports(options: Partial<AutoImportsOptions>) {
 async function collectMatchedFiles(globPatterns: string[]) {
     const matchedFiles = new Set<string>();
     await Promise.all(
-        globPatterns.filter(isAllowedFile).map(async (pattern) => {
-            const scanner = new Glob(resolvePath(pattern)).scan({
+        globPatterns.filter(isEligibleSourceFile).map(async (pattern) => {
+            const scanner = new Glob(resolveImportPath(pattern)).scan({
                 absolute: true,
                 cwd: projectSrcDirPath,
                 onlyFiles: true,
             });
 
             for await (const filePath of scanner) {
-                // eslint-disable-next-line regexp/no-unused-capturing-group
-                if (isAllowedFile(filePath) && /\.(cjs|js|mjs|ts)$/i.test(filePath)) matchedFiles.add(filePath);
+                if (
+                    isEligibleSourceFile(filePath)
+                    && new RegExp(`${allowedExtensionsRegexpString}$`, 'i').test(filePath)
+                ) matchedFiles.add(filePath);
             }
         }),
     );
@@ -109,44 +126,71 @@ async function collectMatchedFiles(globPatterns: string[]) {
     return matchedFiles;
 }
 
-async function parseExportsToImports(files: Set<string>) {
+async function extractExportsAsImports(files: Set<string>) {
     const resolvedImports: Import[] = [];
     await Promise.all(
         [...files].map(async (filePath) => {
             const fileContent = await Bun.file(filePath).text();
-            findExports(fileContent).forEach((esmExport) => {
-                switch (esmExport.type) {
-                    case 'declaration':
-                    case 'named':
-                        esmExport.names.forEach((name) => {
-                            resolvedImports.push({
-                                declarationType: esmExport.declarationType,
-                                from: filePath,
-                                name,
+            await Promise.all(
+                findExports(fileContent).map(async (esmExport) => {
+                    switch (esmExport.type) {
+                        case 'declaration':
+                        case 'named':
+                            esmExport.names.forEach((name) => {
+                                resolvedImports.push({
+                                    declarationType: esmExport.declarationType,
+                                    from: filePath,
+                                    name,
+                                });
                             });
-                        });
 
-                        break;
-                    case 'star':
-                        if (esmExport.name) {
-                            resolvedImports.push({
-                                declarationType: esmExport.declarationType,
-                                from: filePath,
-                                name: esmExport.name,
-                            });
+                            break;
+                        case 'star': {
+                            const resolvedImport = await resolveStarEsmExportToImport(filePath, esmExport);
+                            if (resolvedImport) resolvedImports.push(resolvedImport);
+                            break;
                         }
-
-                        break;
-                }
-            });
+                    }
+                }),
+            );
         }),
     );
 
     return resolvedImports;
 }
 
-function resolvePath(path: string) {
-    if (path.startsWith('@/')) return join(projectSrcDirPath, path.slice(2));
+export function isEligibleSourceFile(filePath: string) {
+    return !filePath.endsWith('.d.ts') && !filePath.includes('node_modules');
+}
+
+function resolveImportPath(path: string) {
+    if (path.startsWith('@/')) return join(projectSrcDirPath, path.substring(2));
     else if (!isAbsolute(path)) return resolve(projectSrcDirPath, path);
     return path;
+}
+
+async function resolveStarEsmExportToImport(filePath: string, esmExport: ESMExport): Promise<Import | undefined> {
+    if (!esmExport.name || !esmExport.specifier) return;
+
+    // External package
+    // eslint-disable-next-line regexp/no-unused-capturing-group
+    if (!/^([./]|@\/)/.test(esmExport.specifier)) {
+        return {
+            as: esmExport.name,
+            declarationType: esmExport.declarationType,
+            from: esmExport.specifier,
+            name: '*',
+        };
+    }
+
+    // Local file
+    let specifier = esmExport.specifier;
+    if (esmExport.specifier.startsWith('@/')) specifier = join(projectSrcDirPath, specifier.substring(2));
+    else if (!isAbsolute(specifier)) specifier = resolve(dirname(filePath), specifier);
+    return {
+        as: esmExport.name,
+        declarationType: esmExport.declarationType,
+        from: await mllyResolvePath(specifier, { extensions: allowedExtensions }),
+        name: '*',
+    };
 }
