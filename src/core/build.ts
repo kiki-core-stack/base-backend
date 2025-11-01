@@ -24,8 +24,8 @@ await import('./generators/routes/production');
 logger.info('Starting build...');
 await Bun.build({
     entrypoints: [
+        join(projectSrcDirPath, 'core/entrypoints/production.ts'),
         join(projectSrcDirPath, 'index.ts'),
-        join(projectSrcDirPath, 'production-entrypoint.ts'),
     ],
     minify: true,
     outdir: projectDistDirPath,

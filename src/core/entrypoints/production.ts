@@ -2,7 +2,7 @@ import type { Subprocess } from 'bun';
 
 import { colorize } from 'consola/utils';
 
-import { logger } from '@/core/globals/logger';
+import { logger } from '../globals/logger';
 
 interface WorkerProcess {
     logPrefix: string;
