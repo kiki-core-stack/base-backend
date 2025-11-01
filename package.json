@@ -14,7 +14,8 @@
     "unused-exports": "ts-unused-exports ./tsconfig.json"
   },
   "dependencies": {
-    "@kiki-core-stack/pack": "^0.84.0",
+    "@hono/zod-validator": "^0.7.4",
+    "@kiki-core-stack/pack": "^0.84.1",
     "@kikiutils/mongoose": "^6.2.0",
     "consola": "^3.4.2",
     "es-toolkit": "^1.41.0",
