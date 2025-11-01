@@ -5,19 +5,17 @@ import type { Server } from 'bun';
 import { setupHonoAppErrorHandling } from '@kiki-core-stack/pack/hono-backend/setups/error-handling';
 
 import { honoApp } from '@/core/app';
-import { logger } from '@/core/utils/logger';
 import { gracefulExit } from '@/graceful-exit';
 
+// Constants/Variables
 let server: Server<any> | undefined;
+
+// Register exit signals
 process.on('SIGINT', () => gracefulExit(server));
 process.on('SIGTERM', () => gracefulExit(server));
 
 // Setup error handling
 setupHonoAppErrorHandling(honoApp, logger);
-
-// Import environment-specific runtime initializers.
-// Used for applying side effects like dev-only tooling, schema extensions, etc.
-await import(`@/core/runtime-inits/${process.env.NODE_ENV}`);
 
 // Load middlewares
 await import('@/middlewares');

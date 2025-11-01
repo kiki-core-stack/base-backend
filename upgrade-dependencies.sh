@@ -8,10 +8,7 @@ cd "${SCRIPTS_DIR}"
 . ./.env.development.local
 export NPM_CONFIG_REGISTRY
 
-[[ " $@ " =~ ' -c ' ]] && rm -rf ./bun.lock ./node_modules ./pnpm-lock.yaml
+[[ " $@ " =~ ' -c ' ]] && rm -rf ./bun.lock ./node_modules
 
-pnpm upgrade -L --lockfile-only &&
-    bun i &&
-    bun update
-
+bun update
 ./modify-files-permissions.sh

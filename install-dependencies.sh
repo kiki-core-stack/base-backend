@@ -8,6 +8,5 @@ cd "${SCRIPTS_DIR}"
 . ./.env.development.local
 export NPM_CONFIG_REGISTRY
 
-pnpm i --lockfile-only
 bun i
 ./modify-files-permissions.sh

@@ -2,36 +2,37 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "build": "NODE_ENV=production bun run ./src/core/build.ts",
+    "base:dev": "cross-env NODE_ENV=development bun --env-file=./.env.development.local",
+    "base:prod": "cross-env NODE_ENV=production bun --env-file=./.env.production.local",
+    "bootstrap:prod": "bun run base:prod -- run ./src/core/bootstrap/index.ts",
+    "build": "bun run base:prod -- run ./src/core/build.ts",
     "depcheck": "depcheck",
-    "dev": "NODE_ENV=development bun --env-file=./.env.development.local --watch run ./src/index.ts",
+    "dev": "bun run base:dev -- --watch run ./src/core/entrypoints/development.ts",
     "lint": "eslint --max-warnings 0",
     "lint:fix": "eslint --fix --max-warnings 0",
     "typecheck": "tsc",
     "unused-exports": "ts-unused-exports ./tsconfig.json"
   },
   "dependencies": {
-    "@asteasolutions/zod-to-openapi": "^8.1.0",
-    "@kiki-core-stack/pack": "^0.82.2",
-    "@kikiutils/mongoose": "^6.1.1",
+    "@kiki-core-stack/pack": "^0.84.0",
+    "@kikiutils/mongoose": "^6.2.0",
     "consola": "^3.4.2",
-    "hono": "^4.9.8",
-    "ioredis": "^5.7.0",
-    "node-ciphers": "^6.1.2",
-    "on-change": "^5.0.1",
-    "zod": "^4.1.9"
+    "es-toolkit": "^1.41.0",
+    "hono": "^4.10.4",
+    "node-ciphers": "^6.1.3",
+    "on-change": "^6.0.1",
+    "zod": "^4.1.12"
   },
   "devDependencies": {
-    "@hono/swagger-ui": "^0.5.2",
-    "@kikiutils/eslint-config": "^3.0.1",
+    "@kikiutils/eslint-config": "^4.0.1",
     "@kikiutils/tsconfigs": "^5.0.5",
-    "@scalar/hono-api-reference": "^0.9.18",
-    "@types/bun": "^1.2.22",
+    "@types/bun": "^1.3.1",
+    "cross-env": "^10.1.0",
     "depcheck": "^1.4.7",
     "mlly": "^1.8.0",
-    "openapi3-ts": "^4.5.0",
     "ts-unused-exports": "^11.0.1",
-    "type-fest": "^5.0.1",
-    "typescript": "^5.9.2"
+    "type-fest": "^5.1.0",
+    "typescript": "^5.9.3",
+    "unimport": "^5.5.0"
   }
 }
