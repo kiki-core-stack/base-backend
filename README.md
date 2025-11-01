@@ -11,7 +11,6 @@ It also comes with pre-configured scripts in `package.json`, allowing you to use
 ## Environment Requirements
 
 - Bun version 1.2 or higher
-- pnpm version 9 or higher (optional)
 
 ## Usage Instructions
 
