@@ -9,6 +9,7 @@ let server: Server<any> | undefined;
 // Register exit signals
 process.on('SIGINT', () => gracefulExit(server));
 process.on('SIGTERM', () => gracefulExit(server));
+process.on('SIGUSR2', () => gracefulExit(server));
 
 // Load middlewares
 await import('@/middlewares');
