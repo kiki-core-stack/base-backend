@@ -7,7 +7,7 @@
     "bootstrap:prod": "bun run base:prod -- run ./src/core/bootstrap/index.ts",
     "build": "bun run base:prod -- run ./src/core/build.ts",
     "depcheck": "depcheck",
-    "dev": "cross-env NODE_ENV=development nodemon --exec 'bun --env-file=./.env.development.local run ./src/core/entrypoints/development.ts' --ext js,mjs,cjs,ts --watch ./src",
+    "dev": "cross-env NODE_ENV=development nodemon",
     "lint": "eslint --max-warnings 0",
     "lint:fix": "eslint --fix --max-warnings 0",
     "typecheck": "tsc",
