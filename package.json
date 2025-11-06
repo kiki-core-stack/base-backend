@@ -15,15 +15,15 @@
   },
   "dependencies": {
     "@hono/zod-validator": "^0.7.4",
-    "@kiki-core-stack/pack": "^0.85.1",
+    "@kiki-core-stack/pack": "^0.87.0",
     "@kikiutils/mongoose": "^6.2.0",
     "@kikiutils/shared": "^13.5.2",
     "argon2": "^0.44.0",
-    "cbor-x": "^1.6.0",
     "consola": "^3.4.2",
     "es-toolkit": "^1.41.0",
     "hono": "^4.10.4",
     "lru-cache": "^11.2.2",
+    "msgpackr": "^1.11.5",
     "node-ciphers": "^6.1.3",
     "on-change": "^6.0.1",
     "sharp": "^0.34.4",
@@ -38,7 +38,7 @@
     "mlly": "^1.8.0",
     "nodemon": "^3.1.10",
     "ts-unused-exports": "^11.0.1",
-    "type-fest": "^5.1.0",
+    "type-fest": "^5.2.0",
     "typescript": "^5.9.3",
     "unimport": "^5.5.0"
   }
