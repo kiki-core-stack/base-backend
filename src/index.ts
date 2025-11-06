@@ -18,6 +18,9 @@ process.on('SIGUSR2', () => gracefulExit(server));
 // Setup error handling
 setupHonoAppErrorHandling(honoApp, logger);
 
+// Initialize system startup
+await (await import('@kiki-core-stack/pack/init')).initializeSystemStartup();
+
 // Load middlewares
 await import('@/middlewares');
 
