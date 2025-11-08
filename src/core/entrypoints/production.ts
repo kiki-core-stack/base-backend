@@ -4,7 +4,7 @@ import { colorize } from 'consola/utils';
 
 interface WorkerProcess {
     logPrefix: string;
-    subprocess: Subprocess<'inherit', 'inherit', 'inherit'>;
+    subprocess: Subprocess<'ignore', 'inherit', 'inherit'>;
 }
 
 let isShuttingDown = false;
@@ -32,7 +32,7 @@ function createAndSetWorker(index: number) {
             setTimeout(() => !isShuttingDown && createAndSetWorker(index), 1000);
         },
         stdio: [
-            'inherit',
+            'ignore',
             'inherit',
             'inherit',
         ],
