@@ -21,7 +21,10 @@ import type { ESMExport } from 'mlly';
 import { createUnimport } from 'unimport';
 import type { Import } from 'unimport';
 
-import { projectSrcDirPath } from '../../constants/paths';
+import {
+    projectRoot,
+    projectSrcDirPath,
+} from '../../constants/paths';
 import * as logger from '../../utils/logger';
 
 interface AutoImportsOptions {
@@ -58,10 +61,12 @@ export function autoImports(options: Partial<AutoImportsOptions>) {
             };
 
             // Normalize explicit imports
-            const normalizedImports = resolvedOptions.imports.map((importDefinition) => ({
-                ...importDefinition,
-                from: resolveImportPath(importDefinition.from),
-            }));
+            const normalizedImports = await Promise.all(
+                resolvedOptions.imports.map(async (importDefinition) => ({
+                    ...importDefinition,
+                    from: await resolveImportPath(importDefinition.from, projectRoot),
+                })),
+            );
 
             // Collect and parse source files
             const matchedFiles = await collectMatchedFiles(resolvedOptions.globs);
@@ -113,7 +118,6 @@ async function collectFileExportsRecursively(filePath: string, visitedFiles: Set
         findExports(await Bun.file(filePath).text()).map(async (esmExport) => {
             switch (esmExport.type) {
                 case 'declaration':
-                case 'named':
                     esmExport.names.forEach((name) => {
                         resolvedImports.push({
                             declarationType: esmExport.declarationType,
@@ -121,6 +125,20 @@ async function collectFileExportsRecursively(filePath: string, visitedFiles: Set
                             name,
                         });
                     });
+
+                    break;
+                case 'named':
+                    await Promise.all(
+                        esmExport.names.map(async (name) => {
+                            resolvedImports.push({
+                                declarationType: esmExport.declarationType,
+                                from: esmExport.specifier
+                                    ? await resolveImportPath(esmExport.specifier, dirname(filePath), true)
+                                    : filePath,
+                                name,
+                            });
+                        }),
+                    );
 
                     break;
                 case 'star': {
@@ -145,7 +163,7 @@ async function collectMatchedFiles(globPatterns: string[]) {
     const matchedFiles = new Set<string>();
     await Promise.all(
         globPatterns.filter(isEligibleSourceFile).map(async (pattern) => {
-            const scanner = new Glob(resolveImportPath(pattern)).scan({
+            const scanner = new Glob(await resolveImportPath(pattern, projectRoot)).scan({
                 absolute: true,
                 cwd: projectSrcDirPath,
                 onlyFiles: true,
@@ -176,10 +194,14 @@ function isEligibleSourceFile(filePath: string) {
     return !filePath.endsWith('.d.ts') && !filePath.includes('node_modules');
 }
 
-function resolveImportPath(path: string) {
-    if (path.startsWith('@/')) return join(projectSrcDirPath, path.substring(2));
-    else if (!isAbsolute(path)) return resolve(projectSrcDirPath, path);
-    return path;
+async function resolveImportPath(path: string, relativePath: string, useMlly?: boolean) {
+    // eslint-disable-next-line regexp/no-unused-capturing-group
+    if (/^([./]|@\/)/.test(path)) {
+        if (path.startsWith('@/')) return join(projectSrcDirPath, path.substring(2));
+        else if (!isAbsolute(path)) return resolve(relativePath, path);
+    }
+
+    return useMlly ? await mllyResolvePath(path, { extensions: allowedExtensions }) : path;
 }
 
 async function resolveStarEsmExportToImportsRecursively(
@@ -188,16 +210,8 @@ async function resolveStarEsmExportToImportsRecursively(
     visitedFiles: Set<string>,
 ) {
     if (!esmExport.specifier) return [];
-
     const resolvedImports: Import[] = [];
-    let specifier = esmExport.specifier;
-    // eslint-disable-next-line regexp/no-unused-capturing-group
-    if (/^([./]|@\/)/.test(specifier)) {
-        if (specifier.startsWith('@/')) specifier = join(projectSrcDirPath, specifier.substring(2));
-        else if (!isAbsolute(specifier)) specifier = resolve(dirname(filePath), specifier);
-    }
-
-    specifier = await mllyResolvePath(specifier, { extensions: allowedExtensions });
+    const specifier = await resolveImportPath(esmExport.specifier, dirname(filePath), true);
     if (!esmExport.name) resolvedImports.push(...await collectFileExportsRecursively(specifier, visitedFiles));
     else {
         resolvedImports.push({
