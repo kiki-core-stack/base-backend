@@ -1,7 +1,6 @@
 import type { Server } from 'bun';
 
 import { redisClient } from '@kiki-core-stack/pack/constants/redis';
-import { mongooseConnections } from '@kikiutils/mongoose/constants';
 
 let isGracefulExitStarted = false;
 
