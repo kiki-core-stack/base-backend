@@ -47,7 +47,9 @@ typecheck:
 
   <<: *bun-cache
 
-  before_script: *setup-bun-and-install-dependencies
+  before_script:
+    - *setup-bun-and-install-dependencies
+    - bun run bootstrap:dev
 
   script:
     - bun run typecheck
