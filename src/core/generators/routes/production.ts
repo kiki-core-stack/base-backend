@@ -5,9 +5,10 @@ import { discoverRouteDefinitions } from '../../libs/router';
 import type { RouteDefinition } from '../../types/route';
 import * as logger from '../../utils/logger';
 
-// Constants
+// Constants/Variables
 const importStatements: string[] = [];
 const constantDeclarations: string[] = [];
+let constNameCounter = 0;
 const usedConstNames = new Set<string>();
 const valueToConstMap = new Map<string, string>();
 
@@ -18,7 +19,7 @@ async function buildRouteRegistrationSnippet(routeDefinition: RouteDefinition, i
         throw new Error(`No default export found in route at ${routeDefinition.filePath}`);
     }
 
-    const importAlias = `route${index}`;
+    const importAlias = `r${index}`;
     importStatements.push(`import * as ${importAlias} from '${routeDefinition.filePath}';`);
     const methodConstName = getOrCreateConstName(routeDefinition.method);
     const pathConstName = getOrCreateConstName(routeDefinition.path);
@@ -33,7 +34,7 @@ function getOrCreateConstName(value: string) {
     if (valueToConstMap.has(value)) return valueToConstMap.get(value)!;
 
     let constName: string;
-    do constName = `v${Math.random().toString(36).substring(2)}`;
+    do constName = `c${constNameCounter++}`;
     while (usedConstNames.has(constName));
 
     constantDeclarations.push(`const ${constName} = '${value}';`);
