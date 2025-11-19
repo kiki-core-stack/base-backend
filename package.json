@@ -4,6 +4,7 @@
   "scripts": {
     "base:dev": "cross-env NODE_ENV=development bun --env-file=./.env.development.local",
     "base:prod": "cross-env NODE_ENV=production bun --env-file=./.env.production.local",
+    "bootstrap:dev": "bun run base:dev -- run ./src/core/bootstrap/index.ts",
     "bootstrap:prod": "bun run base:prod -- run ./src/core/bootstrap/index.ts",
     "build": "bun run base:prod -- run ./src/core/build.ts",
     "depcheck": "depcheck",
