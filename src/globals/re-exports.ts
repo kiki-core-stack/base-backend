@@ -15,3 +15,4 @@ export {
     omit,
     pick,
 } from 'es-toolkit';
+export { nanoid } from 'nanoid';
