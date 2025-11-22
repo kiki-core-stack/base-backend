@@ -8,4 +8,5 @@ export const autoImports = autoImportsPlugin({
         // Add your own settings here.
         '@/globals/**/*.ts',
     ],
+    macroTargets: ['defineRouteHandlerOptions'],
 });

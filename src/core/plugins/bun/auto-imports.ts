@@ -30,6 +30,7 @@ import * as logger from '../../utils/logger';
 interface AutoImportsOptions {
     globs: string[];
     imports: Import[];
+    macroTargets: string[];
 }
 
 // Constants
@@ -57,6 +58,7 @@ export function autoImports(options: Partial<AutoImportsOptions>) {
             const resolvedOptions: AutoImportsOptions = {
                 globs: [],
                 imports: [],
+                macroTargets: [],
                 ...options,
             };
 
@@ -73,7 +75,7 @@ export function autoImports(options: Partial<AutoImportsOptions>) {
 
             // Parse each matched file with mlly.findExports() to extract export symbols
             // Only include named exports and named star exports; skip default exports and type declarations
-            const parsedImports = await extractExportsAsImports(matchedFiles);
+            const parsedImports = await extractExportsAsImports(matchedFiles, resolvedOptions);
 
             // Create a new unimport context to handle auto-imports resolution
             const imports = parsedImports.concat(normalizedImports);
@@ -109,7 +111,7 @@ export function autoImports(options: Partial<AutoImportsOptions>) {
     };
 }
 
-async function collectFileExportsRecursively(filePath: string, visitedFiles: Set<string>) {
+async function collectFileExportsRecursively(filePath: string, visitedFiles: Set<string>, options: AutoImportsOptions) {
     if (visitedFiles.has(filePath)) return [];
     visitedFiles.add(filePath);
 
@@ -119,10 +121,13 @@ async function collectFileExportsRecursively(filePath: string, visitedFiles: Set
             switch (esmExport.type) {
                 case 'declaration':
                     esmExport.names.forEach((name) => {
+                        let withProperties: Record<string, any> | undefined;
+                        if (options.macroTargets.includes(name)) (withProperties ||= {}).type = 'macro';
                         resolvedImports.push({
                             declarationType: esmExport.declarationType,
                             from: filePath,
                             name,
+                            with: withProperties,
                         });
                     });
 
@@ -147,6 +152,7 @@ async function collectFileExportsRecursively(filePath: string, visitedFiles: Set
                             filePath,
                             esmExport,
                             visitedFiles,
+                            options,
                         ),
                     );
 
@@ -181,11 +187,11 @@ async function collectMatchedFiles(globPatterns: string[]) {
     return matchedFiles;
 }
 
-async function extractExportsAsImports(files: Set<string>) {
+async function extractExportsAsImports(files: Set<string>, options: AutoImportsOptions) {
     const visitedFiles = new Set<string>();
     return (
         await Promise.all(
-            [...files].map(async (filePath) => await collectFileExportsRecursively(filePath, visitedFiles)),
+            [...files].map(async (filePath) => await collectFileExportsRecursively(filePath, visitedFiles, options)),
         )
     ).flat();
 }
@@ -208,11 +214,12 @@ async function resolveStarEsmExportToImportsRecursively(
     filePath: string,
     esmExport: ESMExport,
     visitedFiles: Set<string>,
+    options: AutoImportsOptions,
 ) {
     if (!esmExport.specifier) return [];
     const resolvedImports: Import[] = [];
     const specifier = await resolveImportPath(esmExport.specifier, dirname(filePath), true);
-    if (!esmExport.name) resolvedImports.push(...await collectFileExportsRecursively(specifier, visitedFiles));
+    if (!esmExport.name) resolvedImports.push(...await collectFileExportsRecursively(specifier, visitedFiles, options));
     else {
         resolvedImports.push({
             as: esmExport.name,
