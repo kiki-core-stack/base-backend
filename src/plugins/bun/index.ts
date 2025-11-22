@@ -7,4 +7,5 @@ export const autoImports = autoImportsPlugin({
 
         // Add your own settings here.
     ],
+    macroTargets: ['defineRouteHandlerOptions'],
 });
