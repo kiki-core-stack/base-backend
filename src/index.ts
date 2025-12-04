@@ -15,6 +15,10 @@ process.on('SIGINT', () => gracefulExit(server));
 process.on('SIGTERM', () => gracefulExit(server));
 process.on('SIGUSR2', () => gracefulExit(server));
 
+// Import environment-specific runtime initializers.
+// Used for applying side effects like dev-only tooling, schema extensions, etc.
+await import(`@/runtime-inits/${process.env.NODE_ENV}`);
+
 // Setup error handling
 setupHonoAppErrorHandling(honoApp, logger);
 
