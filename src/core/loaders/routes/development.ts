@@ -28,11 +28,18 @@ for (const routeEntry of loadedRouteModules.filter((loadedRouteModule) => loaded
         continue;
     }
 
-    registerRoute(
+    const zodOpenApiConfig = routeEntry.module.zodOpenApiConfig;
+    await registerRoute(
         routeEntry.method,
         routeEntry.path,
         handlers,
         routeEntry.module.routeHandlerOptions,
+        zodOpenApiConfig
+            ? {
+                config: zodOpenApiConfig,
+                path: routeEntry.openApiPath,
+            }
+            : undefined,
     );
 
     loadedRouteCount++;

@@ -13,6 +13,7 @@ import type {
     RouteHandlerOptions,
     RouteHttpMethod,
 } from '../types/route';
+import type { RouteZodOpenApiConfig } from '../types/zod-openapi';
 
 // Functions
 export const normalizeRouteHandlers = (handlers: any) => [handlers].flat().filter((handler) => handler !== undefined);
@@ -52,11 +53,12 @@ function filePathToRank(path: string) {
     return +segments.map((segment, i) => filePathSegmentToRankValue(segment, i === segments.length - 1)).join('');
 }
 
-export function registerRoute(
+export async function registerRoute(
     method: RouteHttpMethod,
     path: string,
     handlers: any[],
     handlerOptions?: RouteHandlerOptions,
+    zodOpenApiOptions?: { config: RouteZodOpenApiConfig; path: string },
 ) {
     const latestHandler = handlers[handlers.length - 1];
 
@@ -74,4 +76,13 @@ export function registerRoute(
 
     honoApp.on(method, path, ...handlers);
     (allRoutes as WritableDeep<typeof allRoutes>)[method][path] = { handlerProperties: handlerOptions?.properties };
+
+    if (process.env.NODE_ENV === 'development' && zodOpenApiOptions) {
+        const { zodOpenApiRegistry } = await import('../constants/zod-openapi');
+        zodOpenApiRegistry.registerPath({
+            ...zodOpenApiOptions.config,
+            method,
+            path: zodOpenApiOptions.path,
+        });
+    }
 }
