@@ -17,20 +17,20 @@ import type {
 // Functions
 export const normalizeRouteHandlers = (handlers: any) => [handlers].flat().filter((handler) => handler !== undefined);
 
-export async function discoverRouteDefinitions(): Promise<RouteDefinition[]> {
+export async function discoverRouteDefinitions() {
     const envSuffix = process.env.NODE_ENV === 'production' ? 'prod' : 'dev';
     const filePattern = new RegExp(
         `^${routesDirPath}(.*?)(/index)?\\.(${allowedRouteHttpMethods.join('|')})(\\.${envSuffix})?\\.(mj|t)s$`,
     );
 
-    const routeDefinitions = [];
+    const routeDefinitions: RouteDefinition[] = [];
     for await (const filePath of glob(`${routesDirPath}/**/*.{mj,t}s`, {})) {
         const matches = filePath.match(filePattern);
         if (!matches) continue;
-        const normalizedRoutePath = matches[1]!.replaceAll(/\/+/g, '/');
+        const normalizedRoutePath = matches[1]!.replaceAll(/\/+/g, '/') || '/';
         routeDefinitions.push({
             filePath,
-            method: matches[3]! as typeof allowedRouteHttpMethods[number],
+            method: matches[3] as typeof allowedRouteHttpMethods[number],
             openApiPath: normalizedRoutePath.replaceAll(/\[([^/]+)\]/g, '{$1}'),
             path: normalizedRoutePath.replaceAll(/\[([^/]+)\]/g, ':$1'),
         });
