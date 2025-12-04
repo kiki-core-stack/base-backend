@@ -11,6 +11,7 @@ export interface Route {
 export interface RouteDefinition {
     filePath: string;
     method: RouteHttpMethod;
+    openApiPath: string;
     path: string;
 }
 
