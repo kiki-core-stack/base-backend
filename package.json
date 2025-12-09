@@ -16,10 +16,9 @@
   },
   "dependencies": {
     "@hono/zod-validator": "^0.7.5",
-    "@kiki-core-stack/pack": "^0.91.0",
+    "@kiki-core-stack/pack": "^0.92.0",
     "@kikiutils/mongoose": "^7.0.0",
     "@kikiutils/shared": "^14.0.0",
-    "argon2": "^0.44.0",
     "consola": "^3.4.2",
     "es-toolkit": "^1.42.0",
     "hono": "^4.10.7",
