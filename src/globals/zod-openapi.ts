@@ -29,7 +29,7 @@ export function defineApiRouteZodOpenApiResponseConfig(
         success: z.literal(errorCodeOrStatusCode === undefined),
     });
 
-    if (dataSchema) schema = schema.extend({ data: dataSchema.optional() });
+    if (dataSchema) schema = schema.extend({ data: dataSchema });
     if (errorCodeOrStatusCode !== undefined) {
         schema = schema.extend({
             errorCode: z.literal(
