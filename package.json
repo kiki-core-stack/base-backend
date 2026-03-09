@@ -7,12 +7,12 @@
     "bootstrap:dev": "bun run base:dev -- run ./src/core/bootstrap/index.ts",
     "bootstrap:prod": "bun run base:prod -- run ./src/core/bootstrap/index.ts",
     "build": "bun run base:prod -- run ./src/core/build.ts",
-    "depcheck": "depcheck",
     "dev": "cross-env NODE_ENV=development nodemon",
+    "knip:deps": "knip --dependencies",
+    "knip:exports": "knip --exports",
     "lint": "eslint --max-warnings 0",
     "lint:fix": "eslint --fix --max-warnings 0",
-    "typecheck": "tsc",
-    "unused-exports": "ts-unused-exports ./tsconfig.json"
+    "typecheck": "tsc"
   },
   "dependencies": {
     "@hono/zod-validator": "^0.7.6",
@@ -31,6 +31,7 @@
     "zod": "^4.3.6"
   },
   "devDependencies": {
+    "@antfu/eslint-config": "^7.7.0",
     "@asteasolutions/zod-to-openapi": "^8.4.3",
     "@hono/swagger-ui": "^0.6.0",
     "@kikiutils/eslint-config": "^7.0.1",
@@ -38,11 +39,10 @@
     "@scalar/hono-api-reference": "^0.10.0",
     "@types/bun": "^1.3.10",
     "cross-env": "^10.1.0",
-    "depcheck": "^1.4.7",
+    "knip": "^5.86.0",
     "mlly": "^1.8.1",
     "nodemon": "^3.1.14",
     "openapi3-ts": "^4.5.0",
-    "ts-unused-exports": "^11.0.1",
     "type-fest": "^5.4.4",
     "typescript": "^5.9.3",
     "unimport": "^6.0.1"
