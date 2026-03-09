@@ -60,7 +60,7 @@ export async function registerRoute(
     handlerOptions?: RouteHandlerOptions,
     zodOpenApiOptions?: { config: RouteZodOpenApiConfig; path: string },
 ) {
-    const latestHandler = handlers[handlers.length - 1];
+    const latestHandler = handlers.at(-1);
 
     Object.defineProperty(
         latestHandler,
