@@ -21,6 +21,7 @@
     "zod": "^4.3.6"
   },
   "devDependencies": {
+    "@antfu/eslint-config": "^7.7.0",
     "@asteasolutions/zod-to-openapi": "^8.4.3",
     "@hono/swagger-ui": "^0.6.0",
     "@kikiutils/eslint-config": "^7.0.1",
