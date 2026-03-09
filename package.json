@@ -7,6 +7,7 @@
     "bootstrap:dev": "bun run base:dev -- run ./src/core/bootstrap/index.ts",
     "bootstrap:prod": "bun run base:prod -- run ./src/core/bootstrap/index.ts",
     "build": "bun run base:prod -- run ./src/core/build.ts",
+    "dev": "cross-env NODE_ENV=development nodemon",
     "knip:deps": "knip --dependencies",
     "knip:exports": "knip --exports",
     "lint": "eslint --max-warnings 0",
