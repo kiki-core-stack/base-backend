@@ -7,7 +7,7 @@ honoApp.use(
     '/api/*',
     (ctx, next) => {
         const routerRoutes = matchedRoutes(ctx);
-        ctx.routeHandler = routerRoutes[routerRoutes.length - 1]?.handler as Context['routeHandler'];
+        ctx.routeHandler = routerRoutes.at(-1)?.handler as Context['routeHandler'];
         return next();
     },
 );

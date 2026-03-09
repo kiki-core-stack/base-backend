@@ -78,7 +78,11 @@ export function autoImports(options: Partial<AutoImportsOptions>) {
             const parsedImports = await extractExportsAsImports(matchedFiles, resolvedOptions);
 
             // Create a new unimport context to handle auto-imports resolution
-            const imports = parsedImports.concat(normalizedImports);
+            const imports = [
+                ...parsedImports,
+                ...normalizedImports,
+            ];
+
             const unimport = createUnimport({ imports });
 
             // Generate .d.ts file
@@ -191,7 +195,7 @@ async function extractExportsAsImports(files: Set<string>, options: AutoImportsO
     const visitedFiles = new Set<string>();
     return (
         await Promise.all(
-            [...files].map(async (filePath) => await collectFileExportsRecursively(filePath, visitedFiles, options)),
+            Array.from(files, (filePath) => collectFileExportsRecursively(filePath, visitedFiles, options)),
         )
     ).flat();
 }
