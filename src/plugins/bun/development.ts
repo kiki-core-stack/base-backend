@@ -1,3 +1,3 @@
-import { autoImports } from '.';
+import { autoImports } from './';
 
 export default [autoImports];
