@@ -46,5 +46,8 @@
     "type-fest": "^5.4.4",
     "typescript": "^5.9.3",
     "unimport": "^6.0.1"
+  },
+  "overrides": {
+    "bson": "7.2.0"
   }
 }
