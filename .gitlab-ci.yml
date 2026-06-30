@@ -81,11 +81,11 @@ build:
 #     - apk update && apk upgrade && apk add git
 #     - |
 #       npm i -g \
-#         semantic-release@latest \
+#         semantic-release@^25 \
 #         @semantic-release/changelog@latest \
 #         @semantic-release/git@latest \
 #         @semantic-release/gitlab@latest \
-#         conventional-changelog-conventionalcommits@latest
+#         conventional-changelog-conventionalcommits@^9
 
 #   script:
 #     - semantic-release
