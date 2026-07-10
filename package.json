@@ -35,7 +35,10 @@
     "nodemon": "^3.1.14",
     "openapi3-ts": "^4.6.0",
     "type-fest": "^5.8.0",
-    "typescript": "^7.0.2",
+    "typescript": "^6.0.3",
     "unimport": "^6.3.0"
+  },
+  "overrides": {
+    "typescript": "^6.0.3"
   }
 }
