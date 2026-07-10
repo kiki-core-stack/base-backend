@@ -16,25 +16,26 @@
   },
   "dependencies": {
     "consola": "^3.4.2",
-    "es-toolkit": "^1.45.1",
-    "hono": "^4.12.5",
-    "zod": "^4.3.6"
+    "es-toolkit": "^1.49.0",
+    "hono": "^4.12.28",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
-    "@antfu/eslint-config": "^7.7.0",
-    "@asteasolutions/zod-to-openapi": "^8.4.3",
-    "@hono/swagger-ui": "^0.6.0",
-    "@kikiutils/eslint-config": "^7.0.1",
-    "@kikiutils/tsconfigs": "^5.1.0",
-    "@scalar/hono-api-reference": "^0.10.0",
-    "@types/bun": "^1.3.10",
+    "@antfu/eslint-config": "^9.1.0",
+    "@asteasolutions/zod-to-openapi": "^8.5.0",
+    "@hono/swagger-ui": "^0.6.1",
+    "@kikiutils/eslint-config": "^9.2.0",
+    "@kikiutils/tsconfigs": "^7.0.0",
+    "@scalar/hono-api-reference": "^0.11.9",
+    "@types/bun": "^1.3.14",
     "cross-env": "^10.1.0",
-    "knip": "^5.86.0",
-    "mlly": "^1.8.1",
+    "eslint": "^10.6.0",
+    "knip": "^6.25.0",
+    "mlly": "^1.8.2",
     "nodemon": "^3.1.14",
-    "openapi3-ts": "^4.5.0",
-    "type-fest": "^5.4.4",
-    "typescript": "^5.9.3",
-    "unimport": "^6.0.1"
+    "openapi3-ts": "^4.6.0",
+    "type-fest": "^5.8.0",
+    "typescript": "^7.0.2",
+    "unimport": "^6.3.0"
   }
 }
