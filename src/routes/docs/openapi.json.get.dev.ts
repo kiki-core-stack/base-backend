@@ -1,4 +1,4 @@
-import { OpenApiGeneratorV31 } from '@asteasolutions/zod-to-openapi';
+import { OpenApiGeneratorV32 } from '@asteasolutions/zod-to-openapi';
 
 import { zodOpenApiRegistry } from '@/core/constants/zod-openapi';
 
@@ -29,7 +29,7 @@ export default defineRouteHandlers((ctx) => {
         return 0;
     });
 
-    const generator = new OpenApiGeneratorV31(definitions);
+    const generator = new OpenApiGeneratorV32(definitions);
     const document = generator.generateDocument({
         info: {
             title: 'API Document',
