@@ -56,16 +56,23 @@ export function session(cipherKey: BinaryLike, tokenHandler: SessionTokenHandler
             { ignoreSymbols: true },
         );
 
-        await next();
-        if (ctx[sessionClearedSymbol]) return tokenHandler.delete(ctx);
-        if (!ctx[sessionChangedSymbol]) return;
-        const encryptResult = cipher.encryptJson([
-            Date.now(),
-            ctx.session,
-        ]);
+        try {
+            await next();
+        } finally {
+            if (ctx[sessionClearedSymbol]) tokenHandler.delete(ctx);
+            else if (ctx[sessionChangedSymbol]) {
+                const encryptResult = cipher.encryptJson([
+                    Date.now(),
+                    ctx.session,
+                ]);
 
-        if (encryptResult.ok) {
-            tokenHandler.set(ctx, `${encryptResult.value.authTag}${encryptResult.value.iv}${encryptResult.value.data}`);
+                if (encryptResult.ok) {
+                    tokenHandler.set(
+                        ctx,
+                        `${encryptResult.value.authTag}${encryptResult.value.iv}${encryptResult.value.data}`,
+                    );
+                }
+            }
         }
     });
 }
