@@ -9,17 +9,17 @@ cd "${SCRIPT_DIR}"
 . ./.env.production.local
 
 # Build and run
-DOCKER_IMAGE_REF="${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG:-latest}"
+DOCKER_IMAGE_REF="${DOCKER_IMAGE_NAME:?must be set}:${DOCKER_IMAGE_TAG:-latest}"
 docker build \
     -t "${DOCKER_IMAGE_REF}" \
-    --build-arg "NPM_CONFIG_REGISTRY=${NPM_CONFIG_REGISTRY}" \
+    --build-arg "NPM_CONFIG_REGISTRY=${NPM_CONFIG_REGISTRY:?must be set}" \
     --pull \
     .
 
-docker stop "${DOCKER_CONTAINER_NAME}" || true
-docker rm "${DOCKER_CONTAINER_NAME}" || true
+docker stop "${DOCKER_CONTAINER_NAME:?must be set}" || true
+docker rm "${DOCKER_CONTAINER_NAME:?must be set}" || true
 docker run \
     -d \
-    --name "${DOCKER_CONTAINER_NAME}" \
+    --name "${DOCKER_CONTAINER_NAME:?must be set}" \
     --restart=always \
     "${DOCKER_IMAGE_REF}"
