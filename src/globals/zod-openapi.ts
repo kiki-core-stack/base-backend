@@ -1,4 +1,4 @@
-import { statusCodeToApiResponseErrorCodeMap } from '@kiki-core-stack/pack/hono-backend/constants/response';
+import { statusCodeToApiResponseErrorCodeMap } from '@kcs-project/pack/hono-backend/constants/response';
 import type { ContentfulStatusCode } from 'hono/utils/http-status';
 import type { Except } from 'type-fest';
 import type { ZodObject } from 'zod';

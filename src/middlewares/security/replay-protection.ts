@@ -1,4 +1,4 @@
-import { createReplayProtectionMiddleware } from '@kiki-core-stack/pack/hono-backend/middlewares/replay-protection';
+import { createReplayProtectionMiddleware } from '@kcs-project/pack/hono-backend/middlewares/replay-protection';
 
 import { honoApp } from '@/core/app';
 

@@ -1,8 +1,8 @@
-export { throwApiError } from '@kiki-core-stack/pack/hono-backend/libs/api';
-export { apiZValidator } from '@kiki-core-stack/pack/hono-backend/libs/api/zod-validator';
-export * as z from '@kiki-core-stack/pack/libs/zod';
-export * as lruStore from '@kiki-core-stack/pack/stores/lru';
-export * as redisStore from '@kiki-core-stack/pack/stores/redis';
+export { throwApiError } from '@kcs-project/pack/hono-backend/libs/api';
+export { apiZValidator } from '@kcs-project/pack/hono-backend/libs/api/zod-validator';
+export * as z from '@kcs-project/pack/libs/zod';
+export * as lruStore from '@kcs-project/pack/stores/lru';
+export * as redisStore from '@kcs-project/pack/stores/redis';
 export { mongooseConnections } from '@kikiutils/mongoose/constants';
 export * from '@kikiutils/shared/enum';
 export * from '@kikiutils/shared/env';

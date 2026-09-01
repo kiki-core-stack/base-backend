@@ -1,6 +1,6 @@
 import type { Server } from 'bun';
 
-import { redisClient } from '@kiki-core-stack/pack/constants/redis';
+import { redisClient } from '@kcs-project/pack/constants/redis';
 
 let isGracefulExitStarted = false;
 

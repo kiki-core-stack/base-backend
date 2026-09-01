@@ -1,4 +1,4 @@
-import { createApiSuccessResponseData } from '@kiki-core-stack/pack/hono-backend/libs/api';
+import { createApiSuccessResponseData } from '@kcs-project/pack/hono-backend/libs/api';
 import type { Context } from 'hono';
 
 import { honoApp } from '@/core/app';
