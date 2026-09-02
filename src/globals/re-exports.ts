@@ -1,3 +1,4 @@
+export * as WsIoEventNames from '@kcs-project/pack/constants/ws.io-event-names';
 export { throwApiError } from '@kcs-project/pack/hono-backend/libs/api';
 export { apiZValidator } from '@kcs-project/pack/hono-backend/libs/api/zod-validator';
 export * as z from '@kcs-project/pack/libs/zod';
