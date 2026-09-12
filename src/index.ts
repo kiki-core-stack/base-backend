@@ -26,7 +26,7 @@ logger.info('Starting server...');
 server = Bun.serve({
     fetch: honoApp.fetch,
     hostname: process.env.SERVER_HOST || '127.0.0.1',
-    port: Number(process.env.SERVER_PORT) || 8000,
+    port: Number(process.env.SERVER_PORT) || 8080,
     reusePort: true,
 });
 

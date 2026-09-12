@@ -20,7 +20,7 @@ docker stop "${DOCKER_CONTAINER_NAME:?must be set}" || true
 docker rm "${DOCKER_CONTAINER_NAME:?must be set}" || true
 docker run \
     -d \
-    -p "${DOCKER_CONTAINER_EXPOSE_HOST:?must be set}:${DOCKER_CONTAINER_EXPOSE_PORT:?must be set}:8000" \
+    -p "${DOCKER_CONTAINER_EXPOSE_HOST:?must be set}:${DOCKER_CONTAINER_EXPOSE_PORT:?must be set}:8080" \
     --name "${DOCKER_CONTAINER_NAME:?must be set}" \
     --restart=always \
     "${DOCKER_IMAGE_REF}"
