@@ -60,7 +60,7 @@ CMD ["./docker-entrypoint.sh"]
 ## Configure remaining runtime defaults
 ENV NODE_ENV='production' \
     SERVER_HOST='0.0.0.0' \
-    SERVER_PORT=8000
+    SERVER_PORT=8080
 
 ## Optionally install runtime packages that provide required executables
 # Replace the placeholder package with the required package name(s) before uncommenting.
