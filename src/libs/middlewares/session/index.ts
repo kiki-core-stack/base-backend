@@ -40,7 +40,7 @@ export function session(cipherKey: BinaryLike, tokenHandler: SessionTokenHandler
                 sessionToken.substring(0, 24),
             );
 
-            if (decryptedResult.ok && decryptedResult.value[0] + 86400000 > Date.now()) {
+            if (decryptedResult.ok && new EnhancedDate(decryptedResult.value[0]).addHours(24).isFuture()) {
                 sessionData = decryptedResult.value[1];
             } else tokenHandler.delete(ctx);
         }
@@ -62,7 +62,7 @@ export function session(cipherKey: BinaryLike, tokenHandler: SessionTokenHandler
             if (ctx[sessionClearedSymbol]) tokenHandler.delete(ctx);
             else if (ctx[sessionChangedSymbol]) {
                 const encryptResult = cipher.encryptJson([
-                    Date.now(),
+                    EnhancedDate.now(),
                     ctx.session,
                 ]);
 
