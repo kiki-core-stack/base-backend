@@ -1,6 +1,7 @@
 import type { Server } from 'bun';
 
 import { redisClient } from '@kcs-project/pack/constants/redis';
+import mongoose from 'mongoose';
 
 let isGracefulExitStarted = false;
 
@@ -12,7 +13,7 @@ export async function gracefulExit(server?: Server<any>) {
 
     // Perform operations such as closing the database connection here.
     redisClient.close();
-    await mongooseConnections.default?.close();
+    await mongoose.disconnect();
 
     logger.success('Graceful shutdown completed');
     process.exit(0);

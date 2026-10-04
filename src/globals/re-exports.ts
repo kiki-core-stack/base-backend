@@ -4,7 +4,7 @@ export { apiZValidator } from '@kcs-project/pack/hono-backend/libs/api/zod-valid
 export * as z from '@kcs-project/pack/libs/zod';
 export * as lruStore from '@kcs-project/pack/stores/lru';
 export * as redisStore from '@kcs-project/pack/stores/redis';
-export { mongooseConnections } from '@kikiutils/mongoose/constants';
+export { getDefaultMongooseConnection } from '@kikiutils/mongoose/connection';
 export { EnhancedDate } from '@kikiutils/shared/classes/enhanced-date';
 export * from '@kikiutils/shared/enum';
 export * from '@kikiutils/shared/env';
