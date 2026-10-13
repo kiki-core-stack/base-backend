@@ -1,6 +1,6 @@
 import type { Server } from 'bun';
 
-import { redisClient } from '@kcs-project/pack/constants/redis';
+import { redisClient } from '@kcs-project/pack/connections/redis';
 import mongoose from 'mongoose';
 
 let isGracefulExitStarted = false;
