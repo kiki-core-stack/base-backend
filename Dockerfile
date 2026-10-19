@@ -14,11 +14,12 @@ WORKDIR /app
 
 ## Copy dependency manifests, manager configuration and install dependencies
 COPY ./bun.lock ./bunfig.toml ./package.json ./
+COPY ./patches ./patches
 RUN --mount=id=bun-cache,target=/root/.bun/install/cache,type=cache \
     bun i --frozen-lockfile
 
 ## Copy application sources and build configuration
-COPY ./.env.production.local ./.gitignore ./eslint.config.mjs ./tsconfig.json ./
+COPY ./.env.production.local ./build.ts ./eslint.config.mjs ./.gitignore ./tsconfig.json ./
 COPY ./src ./src
 
 ## Validate and build the application
@@ -62,12 +63,6 @@ ENV NODE_ENV='production' \
     SERVER_HOST='0.0.0.0' \
     SERVER_PORT=8080
 
-## Optionally install runtime packages that provide required executables
-# Replace the placeholder package with the required package name(s) before uncommenting.
-COPY ./bunfig.toml ./
-RUN --mount=id=bun-runtime-cache,target=/home/user/.bun/install/cache,type=cache,uid=10001 \
-    bun add msgpackr sharp
-
-## Copy the application output and runtime configuration
+## Copy the application output, traced runtime dependencies and runtime configuration
 COPY --chown=10001:nogroup --from=build-stage /app/dist ./
 COPY --chown=10001:nogroup ./.env.production.local ./.env
