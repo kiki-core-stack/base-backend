@@ -2,9 +2,7 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "build": "bun run build:internal --outdir=./dist",
-    "build:internal": "rm -rf ./dist && NODE_ENV=production bun --env-file=./.env.production.local build ./src/index.ts --minify --production --target bun",
-    "compile": "bun run build:internal --compile --outfile ./dist/index",
+    "build": "NODE_ENV=production bun --env-file=./.env.production.local run ./build.ts",
     "dev": "NODE_ENV=development bun --env-file=./.env.development.local --watch run ./src/index.ts",
     "knip:deps": "knip --dependencies",
     "knip:exports": "knip --exports",
@@ -14,12 +12,16 @@
   },
   "dependencies": {},
   "devDependencies": {
-    "@antfu/eslint-config": "^9.3.0",
-    "@kikiutils/eslint-config": "^9.2.0",
+    "@antfu/eslint-config": "^9.5.1",
+    "@kikiutils/eslint-config": "^9.3.0",
     "@kikiutils/tsconfigs": "^7.0.0",
-    "@types/bun": "^1.4.0",
-    "eslint": "^10.8.1",
-    "knip": "^6.32.2",
+    "@types/bun": "^1.4.3",
+    "eslint": "^10.13.0",
+    "knip": "^6.41.0",
+    "nf3": "^0.4.2",
+    "oxc-minify": "^0.154.0",
+    "pkg-types": "^2.3.3",
+    "pretty-bytes": "^7.2.0",
     "typescript": "^6.0.3"
   },
   "overrides": {
