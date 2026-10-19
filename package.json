@@ -18,16 +18,10 @@
     "@types/bun": "^1.4.3",
     "eslint": "^10.13.0",
     "knip": "^6.41.0",
-    "nf3": "^0.4.2",
-    "oxc-minify": "^0.154.0",
-    "pkg-types": "^2.3.3",
     "pretty-bytes": "^7.2.0",
     "typescript": "^6.0.3"
   },
   "overrides": {
     "typescript": "^6.0.3"
-  },
-  "patchedDependencies": {
-    "nf3@0.4.2": "patches/nf3@0.4.2.patch"
   }
 }

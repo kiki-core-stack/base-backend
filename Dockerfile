@@ -14,7 +14,6 @@ WORKDIR /app
 
 ## Copy dependency manifests, manager configuration and install dependencies
 COPY ./bun.lock ./bunfig.toml ./package.json ./
-COPY ./patches ./patches
 RUN --mount=id=bun-cache,target=/root/.bun/install/cache,type=cache \
     bun i --frozen-lockfile
 
@@ -60,6 +59,13 @@ CMD ["./docker-entrypoint.sh"]
 ## Configure remaining runtime defaults
 ENV NODE_ENV='production'
 
-## Copy the application output, traced runtime dependencies and runtime configuration
+## Copy dependency manifests and install production dependencies
+ARG NPM_CONFIG_REGISTRY
+COPY --chown=10001:nogroup ./bun.lock ./bunfig.toml ./package.json ./
+RUN --mount=id=bun-runtime-cache,target=/home/user/.bun/install/cache,type=cache,uid=10001,gid=65534 \
+    NPM_CONFIG_REGISTRY="${NPM_CONFIG_REGISTRY}" \
+    bun i --production --frozen-lockfile
+
+## Copy the application output and runtime configuration
 COPY --chown=10001:nogroup --from=build-stage /app/dist ./
 COPY --chown=10001:nogroup ./.env.production.local ./.env
