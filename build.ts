@@ -50,7 +50,7 @@ const optionalTracePackageNames = [
 ];
 
 // Functions
-export async function build(options: BuildOptions = {}) {
+export async function runBuild(options: BuildOptions = {}) {
     const packageManifestCache = new Map<string, PackageJson>();
 
     // Include dynamically selected transports or packages not visible to static tracing.
@@ -247,4 +247,4 @@ export async function build(options: BuildOptions = {}) {
     };
 }
 
-if (import.meta.main) await build();
+if (import.meta.main) await runBuild();
