@@ -20,23 +20,21 @@ import {
 } from 'nf3/db';
 import { minify } from 'oxc-minify';
 import { readPackageJSON } from 'pkg-types';
+import type { PackageJson } from 'pkg-types';
 import prettyBytes from 'pretty-bytes';
+
+export type BuildOptions = Partial<Pick<Bun.BuildConfig, 'entrypoints' | 'plugins' | 'root' | 'splitting'>> & {
+    additionalTracePackageNames?: readonly string[];
+    fullTracePackageEntries?: ExternalsTraceOptions['fullTraceInclude'];
+};
 
 // Constants/Variables
 const projectDirectoryPath = import.meta.dirname;
 const outputDirectoryPath = join(projectDirectoryPath, 'dist');
+const executableDirectoryPath = join(outputDirectoryPath, 'node_modules/.bin');
 const filesystemRootPath = parse(projectDirectoryPath).root;
-const nativePackageNames = new Set(NodeNativePackages);
 
-// Include dynamically selected transports or packages not visible to static tracing.
-// This array is shared with nf3 so additions in traceResult are visible to it.
-const additionalTracePackageNames: string[] = [];
-// const additionalTracePackageNames: string[] = [
-//     'pino-pretty',
-//     'pino-roll',
-// ];
-
-const fullTracePackageEntries: NonNullable<ExternalsTraceOptions['fullTraceInclude']> = [
+const defaultFullTracePackageEntries: NonNullable<ExternalsTraceOptions['fullTraceInclude']> = [
     ...FullTracePackages,
     'chromium-bidi',
     // Pino also publishes intentionally invalid test fixtures; copy only runtime files.
@@ -46,152 +44,207 @@ const fullTracePackageEntries: NonNullable<ExternalsTraceOptions['fullTraceInclu
     ],
 ];
 
-// Run
-await rm(
-    outputDirectoryPath,
-    {
-        force: true,
-        recursive: true,
-    },
-);
+const optionalTracePackageNames = [
+    'pino-pretty',
+    'pino-roll',
+];
 
-const buildResult = await Bun.build({
-    entrypoints: [join(projectDirectoryPath, 'src/index.ts')],
-    minify: true,
-    outdir: outputDirectoryPath,
-    packages: 'external',
-    target: 'bun',
-    throw: false,
-});
+// Functions
+export async function build(options: BuildOptions = {}) {
+    const packageManifestCache = new Map<string, PackageJson>();
 
-if (!buildResult.success) {
-    for (const log of buildResult.logs) console.error(log);
-    process.exit(1);
-}
+    // Include dynamically selected transports or packages not visible to static tracing.
+    // This array is shared with nf3 so additions in traceResult are visible to it.
+    const additionalTracePackageNames = [...options.additionalTracePackageNames ?? []];
+    for (const packageName of optionalTracePackageNames) {
+        try {
+            Bun.resolveSync(packageName, projectDirectoryPath);
+            if (!additionalTracePackageNames.includes(packageName)) additionalTracePackageNames.push(packageName);
+        } catch (error) {
+            if ((error as NodeJS.ErrnoException).code !== 'ERR_MODULE_NOT_FOUND') throw error;
+        }
+    }
 
-const tracedLayout = await traceNodeModules(
-    buildResult.outputs
-        .filter((output) => output.kind === 'entry-point' || output.kind === 'chunk')
-        .map((output) => output.path),
-    {
-        chmod: true,
-        conditions: [
-            'bun',
-            'default',
-            'import',
-            'node',
-            'production',
-        ],
-        fullTraceInclude: fullTracePackageEntries,
-        hooks: {
-            async traceResult(fileTraceResult) {
-                for (const warning of fileTraceResult.warnings) console.warn(warning.message);
+    const fullTracePackageEntries: NonNullable<ExternalsTraceOptions['fullTraceInclude']> = [
+        ...options.fullTracePackageEntries ?? [],
+        ...defaultFullTracePackageEntries,
+    ];
 
-                // Native optional dependencies can be invisible to static tracing.
-                // Add their names before nf3 resolves includes from each declaring package.
-                for (const filePath of fileTraceResult.fileList) {
-                    if (!filePath.endsWith('/package.json')) continue;
-                    const packageManifest = await readPackageJSON(join(filesystemRootPath, filePath), { cache: true });
-                    const includedPackageNames = Object
-                        .keys({
-                            ...packageManifest.dependencies,
-                            ...packageManifest.optionalDependencies,
-                        })
-                        .filter((packageName) => nativePackageNames.has(packageName));
+    await rm(
+        outputDirectoryPath,
+        {
+            force: true,
+            recursive: true,
+        },
+    );
 
-                    for (const packageName of includedPackageNames) {
-                        if (!additionalTracePackageNames.includes(packageName)) {
-                            additionalTracePackageNames.push(packageName);
+    const buildResult = await Bun.build({
+        entrypoints: options.entrypoints ?? [join(projectDirectoryPath, 'src/index.ts')],
+        minify: true,
+        outdir: outputDirectoryPath,
+        packages: 'external',
+        plugins: options.plugins,
+        root: options.root,
+        splitting: options.splitting,
+        target: 'bun',
+        throw: false,
+    });
+
+    if (!buildResult.success) {
+        for (const log of buildResult.logs) console.error(log);
+        throw new Error('Application build failed');
+    }
+
+    const tracedLayout = await traceNodeModules(
+        buildResult.outputs
+            .filter((output) => output.kind === 'entry-point' || output.kind === 'chunk')
+            .map((output) => output.path),
+        {
+            chmod: true,
+            conditions: [
+                'bun',
+                'default',
+                'import',
+                'node',
+                'production',
+            ],
+            fullTraceInclude: fullTracePackageEntries,
+            hooks: {
+                async traceResult(fileTraceResult) {
+                    for (const warning of fileTraceResult.warnings) console.warn(warning.message);
+
+                    // Native optional dependencies can be invisible to static tracing.
+                    // Add their names before nf3 resolves includes from each declaring package.
+                    for (const filePath of fileTraceResult.fileList) {
+                        if (!filePath.endsWith('/package.json')) continue;
+                        const packageManifest = await readPackageJSON(
+                            join(filesystemRootPath, filePath),
+                            { cache: packageManifestCache },
+                        );
+
+                        const includedPackageNames = Object
+                            .keys({
+                                ...packageManifest.dependencies,
+                                ...packageManifest.optionalDependencies,
+                            })
+                            .filter((packageName) => NodeNativePackages.includes(packageName));
+
+                        for (const packageName of includedPackageNames) {
+                            if (!additionalTracePackageNames.includes(packageName)) {
+                                additionalTracePackageNames.push(packageName);
+                            }
                         }
                     }
-                }
-            },
-        },
-        nft: { base: filesystemRootPath },
-        outDir: outputDirectoryPath,
-        rootDir: projectDirectoryPath,
-        traceInclude: additionalTracePackageNames,
-        transform: [
-            {
-                filter: (filePath) => /\.[cm]?js$/.test(filePath),
-                async handler(sourceCode, filePath) {
-                    const extension = extname(filePath);
-                    const isEsm = extension === '.mjs'
-                      || (extension === '.js' && (await readPackageJSON(filePath, { cache: true })).type === 'module');
-
-                    const minifyResult = await minify(
-                        `${filePath}${isEsm ? '.mjs' : '.cjs'}`,
-                        sourceCode,
-                        {
-                            codegen: { legalComments: 'inline' },
-                            compress: {
-                                keepNames: {
-                                    class: true,
-                                    function: true,
-                                },
-                            },
-                            mangle: {
-                                keepNames: true,
-                                reserved: [
-                                    'exports',
-                                    'module',
-                                ],
-                            },
-                            module: isEsm,
-                        },
-                    );
-
-                    if (minifyResult.errors.length) {
-                        throw new Error([
-                            `Failed to minify ${filePath}:`,
-                            ...minifyResult.errors.map((error) => error.message),
-                        ].join('\n'));
-                    }
-
-                    return minifyResult.code;
                 },
             },
-        ],
-    },
-);
+            nft: { base: filesystemRootPath },
+            outDir: outputDirectoryPath,
+            rootDir: projectDirectoryPath,
+            traceInclude: additionalTracePackageNames,
+            transform: [
+                {
+                    filter: (filePath) => /\.[cm]?js$/.test(filePath),
+                    async handler(sourceCode, filePath) {
+                        const extension = extname(filePath);
+                        const isEsm = extension === '.mjs'
+                          || (
+                              extension === '.js'
+                              && (await readPackageJSON(filePath, { cache: packageManifestCache })).type === 'module'
+                          );
 
-// Tracing copies package files but does not recreate package-manager CLI links.
-const executableDirectoryPath = join(outputDirectoryPath, 'node_modules/.bin');
-for (const tracedPackage of Object.values(tracedLayout.packages)) {
-    const packageDirectoryPath = join(outputDirectoryPath, tracedPackage.versions[tracedPackage.hoisted]!.outPath);
-    const packageManifest = await readPackageJSON(join(packageDirectoryPath, 'package.json'), { cache: true });
-    const executableRelativePaths: Record<string, string> = typeof packageManifest.bin === 'string'
-        ? { [basename(tracedPackage.name)]: packageManifest.bin }
-        : packageManifest.bin ?? {};
+                        const minifyResult = await minify(
+                            `${filePath}${isEsm ? '.mjs' : '.cjs'}`,
+                            sourceCode,
+                            {
+                                codegen: { legalComments: 'inline' },
+                                compress: {
+                                    keepNames: {
+                                        class: true,
+                                        function: true,
+                                    },
+                                },
+                                mangle: {
+                                    keepNames: true,
+                                    reserved: [
+                                        'exports',
+                                        'module',
+                                    ],
+                                },
+                                module: isEsm,
+                            },
+                        );
 
-    for (const [executableName, executableRelativePath] of Object.entries(executableRelativePaths)) {
-        const executableFilePath = join(packageDirectoryPath, executableRelativePath);
-        const executableFileStats = await stat(executableFilePath).catch((error: NodeJS.ErrnoException) => {
-            if (error.code !== 'ENOENT') throw error;
-        });
+                        if (minifyResult.errors.length) {
+                            throw new Error(
+                                [
+                                    `Failed to minify ${filePath}:`,
+                                    ...minifyResult.errors.map((error) => error.message),
+                                ].join('\n'),
+                            );
+                        }
 
-        if (!executableFileStats?.isFile()) continue;
-        await mkdir(executableDirectoryPath, { recursive: true });
-        await symlink(
-            relative(executableDirectoryPath, executableFilePath),
-            join(executableDirectoryPath, executableName),
-        );
+                        return minifyResult.code;
+                    },
+                },
+            ],
+        },
+    );
+
+    // Explicit includes must resolve, including those declared by nested traced packages.
+    for (const packageName of options.additionalTracePackageNames ?? []) {
+        if (!tracedLayout.packages[packageName]) {
+            throw new Error(`Required runtime package "${packageName}" could not be traced`);
+        }
     }
+
+    // Tracing copies package files but does not recreate package-manager CLI links.
+    for (const tracedPackage of Object.values(tracedLayout.packages)) {
+        const packageDirectoryPath = join(outputDirectoryPath, tracedPackage.versions[tracedPackage.hoisted]!.outPath);
+        const packageManifest = await readPackageJSON(
+            join(packageDirectoryPath, 'package.json'),
+            { cache: packageManifestCache },
+        );
+
+        const executableRelativePaths: Record<string, string> = typeof packageManifest.bin === 'string'
+            ? { [basename(tracedPackage.name)]: packageManifest.bin }
+            : packageManifest.bin ?? {};
+
+        for (const [executableName, executableRelativePath] of Object.entries(executableRelativePaths)) {
+            const executableFilePath = join(packageDirectoryPath, executableRelativePath);
+            const executableFileStats = await stat(executableFilePath).catch((error: NodeJS.ErrnoException) => {
+                if (error.code !== 'ENOENT') throw error;
+            });
+
+            if (!executableFileStats?.isFile()) continue;
+            await mkdir(executableDirectoryPath, { recursive: true });
+            await symlink(
+                relative(executableDirectoryPath, executableFilePath),
+                join(executableDirectoryPath, executableName),
+            );
+        }
+    }
+
+    const outputs = buildResult.outputs
+        .map((output) => ({
+            path: relative(outputDirectoryPath, output.path),
+            size: output.size,
+        }))
+        .sort((a, b) => b.size - a.size || a.path.localeCompare(b.path));
+
+    const outputPathColumnWidth = Math.max(0, ...outputs.map((output) => output.path.length));
+    const totalOutputSize = outputs.reduce((total, output) => total + output.size, 0);
+    process.stdout.write([
+        'Build outputs (dist/):',
+        ...outputs.map((output) => `  ${output.path.padEnd(outputPathColumnWidth)}  ${prettyBytes(output.size)}`),
+        `Build completed: ${outputs.length} files, ${prettyBytes(totalOutputSize)} total`,
+        `Copied ${Object.keys(tracedLayout.packages).length} runtime package(s).`,
+        '',
+    ].join('\n'));
+
+    return {
+        buildResult,
+        tracedLayout,
+    };
 }
 
-const outputs = buildResult.outputs
-    .map((output) => ({
-        path: relative(outputDirectoryPath, output.path),
-        size: output.size,
-    }))
-    .sort((a, b) => b.size - a.size || a.path.localeCompare(b.path));
-
-const outputPathColumnWidth = Math.max(0, ...outputs.map((output) => output.path.length));
-const totalOutputSize = outputs.reduce((total, output) => total + output.size, 0);
-process.stdout.write([
-    'Build outputs (dist/):',
-    ...outputs.map((output) => `  ${output.path.padEnd(outputPathColumnWidth)}  ${prettyBytes(output.size)}`),
-    `Build completed: ${outputs.length} files, ${prettyBytes(totalOutputSize)} total`,
-    `Copied ${Object.keys(tracedLayout.packages).length} runtime package(s).`,
-    '',
-].join('\n'));
+if (import.meta.main) await build();
