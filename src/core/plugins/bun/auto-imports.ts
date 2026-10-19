@@ -118,6 +118,10 @@ export function autoImports(options: Partial<AutoImportsOptions>) {
     };
 }
 
+// TODO: Before disabling packages: 'external', recheck Bun's handling of bundled re-exports.
+// Bun 1.4.3 can emit undefined bindings when a bundled package re-exports an external module
+// (for example, export * from 'node:path'), even without minification or code splitting.
+// Preserving package specifiers below respects the build setting but does not fix that Bun bug.
 async function collectFileExportsRecursively(filePath: string, visitedFiles: Set<string>): Promise<Import[]> {
     if (visitedFiles.has(filePath)) return [];
     visitedFiles.add(filePath);
@@ -186,6 +190,8 @@ async function collectFileExportsRecursively(filePath: string, visitedFiles: Set
                         name: '*',
                     });
                 } else {
+                    // TODO: Handle Node builtins without reading them as files during recursive scans.
+                    // This limitation applies regardless of the packages: 'external' setting.
                     const resolvedFilePath = Bun.resolveSync(specifier, dirname(filePath));
                     resolvedImports.push(...await collectFileExportsRecursively(resolvedFilePath, visitedFiles));
                 }
