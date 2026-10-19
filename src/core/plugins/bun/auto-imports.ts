@@ -126,7 +126,6 @@ async function collectFileExportsRecursively(filePath: string, visitedFiles: Set
     for (const esmExport of findExports(await Bun.file(filePath).text())) {
         switch (esmExport.type) {
             case 'declaration':
-            case 'named':
                 for (const name of esmExport.names) {
                     if (name === 'default') continue;
                     resolvedImports.push({
@@ -137,6 +136,46 @@ async function collectFileExportsRecursively(filePath: string, visitedFiles: Set
                 }
 
                 break;
+            case 'named': {
+                if (!esmExport.specifier) {
+                    for (const name of esmExport.names) {
+                        if (name === 'default') continue;
+                        resolvedImports.push({
+                            declarationType: esmExport.declarationType,
+                            from: filePath,
+                            name,
+                        });
+                    }
+
+                    break;
+                }
+
+                const specifier = Bun.resolveSync(
+                    normalizeImportPath(esmExport.specifier, dirname(filePath)),
+                    dirname(filePath),
+                );
+
+                // Keep the original binding and exported alias without importing the barrel.
+                const bindings = /^export\s*\{([^}]*)\}/.exec(esmExport.code)?.[1] ?? '';
+                for (const binding of bindings.split(',')) {
+                    const [name, exportedName = name] = binding.trim().split(/\s+as\s+/);
+                    if (
+                        !name
+                        || !exportedName
+                        || exportedName === 'default'
+                        || !esmExport.names.includes(exportedName)
+                    ) continue;
+
+                    resolvedImports.push({
+                        as: exportedName,
+                        declarationType: esmExport.declarationType,
+                        from: specifier,
+                        name,
+                    });
+                }
+
+                break;
+            }
             case 'star': {
                 if (!esmExport.specifier) break;
                 const specifier = Bun.resolveSync(
