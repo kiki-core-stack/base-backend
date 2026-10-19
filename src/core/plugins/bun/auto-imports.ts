@@ -150,10 +150,8 @@ async function collectFileExportsRecursively(filePath: string, visitedFiles: Set
                     break;
                 }
 
-                const specifier = Bun.resolveSync(
-                    normalizeImportPath(esmExport.specifier, dirname(filePath)),
-                    dirname(filePath),
-                );
+                // Preserve bare package specifiers so packages: 'external' still applies.
+                const specifier = normalizeImportPath(esmExport.specifier, dirname(filePath));
 
                 // Keep the original binding and exported alias without importing the barrel.
                 const bindings = /^export\s*\{([^}]*)\}/.exec(esmExport.code)?.[1] ?? '';
@@ -178,10 +176,8 @@ async function collectFileExportsRecursively(filePath: string, visitedFiles: Set
             }
             case 'star': {
                 if (!esmExport.specifier) break;
-                const specifier = Bun.resolveSync(
-                    normalizeImportPath(esmExport.specifier, dirname(filePath)),
-                    dirname(filePath),
-                );
+                // Preserve bare package specifiers so packages: 'external' still applies.
+                const specifier = normalizeImportPath(esmExport.specifier, dirname(filePath));
 
                 if (esmExport.name) {
                     resolvedImports.push({
@@ -189,7 +185,10 @@ async function collectFileExportsRecursively(filePath: string, visitedFiles: Set
                         from: specifier,
                         name: '*',
                     });
-                } else resolvedImports.push(...await collectFileExportsRecursively(specifier, visitedFiles));
+                } else {
+                    const resolvedFilePath = Bun.resolveSync(specifier, dirname(filePath));
+                    resolvedImports.push(...await collectFileExportsRecursively(resolvedFilePath, visitedFiles));
+                }
 
                 break;
             }
