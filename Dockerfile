@@ -14,6 +14,7 @@ WORKDIR /app
 
 ## Copy dependency manifests, manager configuration and install dependencies
 COPY ./bun.lock ./bunfig.toml ./package.json ./
+COPY ./patches ./patches
 RUN --mount=id=bun-cache,target=/root/.bun/install/cache,type=cache \
     bun i --frozen-lockfile
 

@@ -43,5 +43,8 @@
   },
   "overrides": {
     "typescript": "^6.0.3"
+  },
+  "patchedDependencies": {
+    "nf3@0.4.2": "patches/nf3@0.4.2.patch"
   }
 }
