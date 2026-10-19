@@ -31,11 +31,8 @@
     "eslint": "^10.13.0",
     "knip": "^6.41.0",
     "mlly": "^1.8.2",
-    "nf3": "^0.4.2",
     "nodemon": "^3.1.14",
     "openapi3-ts": "^4.6.2",
-    "oxc-minify": "^0.154.0",
-    "pkg-types": "^2.3.3",
     "pretty-bytes": "^7.2.0",
     "type-fest": "^5.10.0",
     "typescript": "^6.0.3",
@@ -43,8 +40,5 @@
   },
   "overrides": {
     "typescript": "^6.0.3"
-  },
-  "patchedDependencies": {
-    "nf3@0.4.2": "patches/nf3@0.4.2.patch"
   }
 }
