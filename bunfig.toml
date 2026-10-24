@@ -5,6 +5,8 @@ linker = "isolated"
 minimumReleaseAge = 86400
 minimumReleaseAgeExcludes = [
   "@types/bun",
-  "bun-types"
+  "bun-types",
+
+  "@kikiutils/eslint-config", # TODO: remove it
 ]
 telemetry = false
