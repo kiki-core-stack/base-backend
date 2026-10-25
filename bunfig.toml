@@ -8,5 +8,6 @@ minimumReleaseAgeExcludes = [
   "bun-types",
 
   "@kikiutils/eslint-config", # TODO: remove it
+  "@kikiutils/shared", # TODO: remove it
 ]
 telemetry = false

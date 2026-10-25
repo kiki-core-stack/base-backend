@@ -5,7 +5,7 @@ import bunProductionPlugins from '@/plugins/bun/production';
 import { runBuild } from '../../build';
 
 import { projectSrcDirPath } from './constants/paths';
-import * as logger from './utils/logger';
+import { logger } from './logger';
 
 // Generate routes before the shared build pipeline runs.
 await import('./generators/routes/production');
