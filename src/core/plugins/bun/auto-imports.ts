@@ -19,7 +19,7 @@ import {
     projectRoot,
     projectSrcDirPath,
 } from '../../constants/paths';
-import * as logger from '../../utils/logger';
+import { logger } from '../../logger';
 
 interface AutoImportsOptions {
     globs: string[];

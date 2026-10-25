@@ -5,11 +5,9 @@
     "": {
       "dependencies": {
         "@hono/zod-validator": "^0.9.1",
-        "@kcs-project/pack": "git+https://github.com/kiki-core-stack/pack#fdbdee886f6d83692684f8e7a238289d064ac644",
+        "@kcs-project/pack": "git+https://github.com/kiki-core-stack/pack#b23dae8cb0fb9bf08dba746b28ff20446b35b98f",
         "@kikiutils/mongoose": "^9.0.1",
         "@kikiutils/shared": "^19.0.0",
-        "consola": "^3.4.2",
-        "date-fns": "^4.4.0",
         "es-toolkit": "^1.53.0",
         "file-type": "^22.2.0",
         "hono": "^4.13.13",
@@ -185,7 +183,7 @@
 
     "@jridgewell/trace-mapping": ["@jridgewell/trace-mapping@0.3.31", "", { "dependencies": { "@jridgewell/resolve-uri": "^3.1.0", "@jridgewell/sourcemap-codec": "^1.4.14" } }, "sha512-zzNR+SdQSDJzc8joaeP8QQoCQr8NuYx2dIIytl1QeBEZHJ9uW6hebsrYgbz8hJwUQao3TWCMtmfV8Nu1twOLAw=="],
 
-    "@kcs-project/pack": ["@kiki-core-stack/pack@github:kiki-core-stack/pack#fdbdee8", { "peerDependencies": { "@hono/zod-validator": "^0.9.1", "@kikiutils/mongoose": "^9.0.1", "@kikiutils/shared": "^18.2.0", "axios": "^1.20.0", "consola": "^3.4.2", "date-fns": "^4.4.0", "es-toolkit": "^1.52.0", "file-type": "^22.1.1", "hono": "^4.13.13", "http-proxy-agent": "^9.1.0", "https-proxy-agent": "^9.1.0", "ipaddr.js": "^2.5.0", "lru-cache": "^11.5.3", "mongoose": "^9.11.2", "nanoid": "^6.0.2", "nodemailer": "^10.1.0", "sharp": "^0.35.5", "type-fest": "^5.10.0", "ws.io-client": "^0.4.1", "zod": "^4.6.7" }, "optionalPeers": ["@hono/zod-validator", "@kikiutils/mongoose", "@kikiutils/shared", "axios", "consola", "date-fns", "es-toolkit", "file-type", "hono", "http-proxy-agent", "https-proxy-agent", "ipaddr.js", "lru-cache", "mongoose", "nanoid", "nodemailer", "sharp", "type-fest", "ws.io-client", "zod"] }, "kiki-core-stack-pack-fdbdee8", "sha512-R4//cb80LKFzH6CG4XliwxKQvS/M7kVtqMz6UkEi5x1H8/4xXnHH6MS7d9WL00ACca/ZNrvgZH5AUZ2UfUd5LA=="],
+    "@kcs-project/pack": ["@kiki-core-stack/pack@github:kiki-core-stack/pack#b23dae8", { "peerDependencies": { "@hono/zod-validator": "^0.9.1", "@kikiutils/mongoose": "^9.0.1", "@kikiutils/shared": "^19.0.0", "axios": "^1.20.0", "date-fns": "^4.4.0", "es-toolkit": "^1.53.0", "file-type": "^22.2.0", "hono": "^4.13.14", "http-proxy-agent": "^9.1.0", "https-proxy-agent": "^9.1.0", "ipaddr.js": "^2.5.0", "lru-cache": "^11.5.3", "mongoose": "^9.11.4", "nanoid": "^6.0.2", "nodemailer": "^10.2.1", "sharp": "^0.35.5", "type-fest": "^5.10.0", "ws.io-client": "^0.6.0", "zod": "^4.6.7" }, "optionalPeers": ["@hono/zod-validator", "@kikiutils/mongoose", "@kikiutils/shared", "axios", "date-fns", "es-toolkit", "file-type", "hono", "http-proxy-agent", "https-proxy-agent", "ipaddr.js", "lru-cache", "mongoose", "nanoid", "nodemailer", "sharp", "type-fest", "ws.io-client", "zod"] }, "kiki-core-stack-pack-b23dae8", "sha512-4oR5ejdE6Jn3d9Sj8YfiAn4+XfioXHisw11owxw1iOrUcu7lEoplaedIz0UFNx61hvCLgklz95IRPDJ0xTHLQg=="],
 
     "@keyv/bigmap": ["@keyv/bigmap@1.3.1", "", { "dependencies": { "hashery": "^1.4.0", "hookified": "^1.15.0" }, "peerDependencies": { "keyv": "^5.6.0" } }, "sha512-WbzE9sdmQtKy8vrNPa9BRnwZh5UF4s1KTmSK0KUVLo3eff5BlQNNWDnFOouNpKfPKDnms9xynJjsMYjMaT/aFQ=="],
 
@@ -435,15 +433,11 @@
 
     "confbox": ["confbox@0.1.8", "", {}, "sha512-RMtmw0iFkeR4YV+fUOSucriAQNb9g8zFR52MWCtl+cCZOFRNL6zeB395vPzFhEjjn4fMxXudmELnl/KF/WrK6w=="],
 
-    "consola": ["consola@3.4.2", "", {}, "sha512-5IKcdX0nnYavi6G7TtOhwkYzyjfJlatbjMjuLSfE2kYT5pMDOilZ4OvMhi637CcDICTmz3wARPoyhqyX1Y+XvA=="],
-
     "core-js-compat": ["core-js-compat@3.51.0", "", { "dependencies": { "browserslist": "^4.29.3" } }, "sha512-52r6fkXgxv4GLMjmFcMWRx7X9bw071xTTdrDcdyPGRqU2oE+9pCG0bAOMifSBdLw0JRBZKEF0q3B55qPlLuE8g=="],
 
     "cross-spawn": ["cross-spawn@7.0.6", "", { "dependencies": { "path-key": "^3.1.0", "shebang-command": "^2.0.0", "which": "^2.0.1" } }, "sha512-uV2QOWP2nWzsy2aMp8aRibhi9dlzF5Hgh5SHaB9OiTGEyDTiJJyx0uy51QXdyWbtAHNua4XJzUKca3OzKUd3vA=="],
 
     "cssesc": ["cssesc@3.0.0", "", { "bin": { "cssesc": "bin/cssesc" } }, "sha512-/Tb/JcjK111nNScGob5MNtsntNM1aCNUDipB/TkwZFhyDrrE47SOx/18wF2bbjgc3ZzCSKW1T5nt5EbFoAz/Vg=="],
-
-    "date-fns": ["date-fns@4.4.0", "", {}, "sha512-+1UMbeh68lH1SegH83CGWwpb6OHHbpSgr3+s5Eww5M4CAgswBpoWS0AjTOfEJ33HiYKz1hdj/KTFprzXHmq/6w=="],
 
     "debug": ["debug@4.4.3", "", { "dependencies": { "ms": "^2.1.3" }, "peerDependencies": { "supports-color": "*" }, "optionalPeers": ["supports-color"] }, "sha512-RGwwWnwQvkVfavKVt22FGLw+xYSdzARwm0ru6DhTVA3umU5hZc28V3kO4stgYryrTlLpuvgI9GiijltAjNbcqA=="],
 

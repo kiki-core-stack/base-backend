@@ -1,7 +1,5 @@
 import type { Subprocess } from 'bun';
 
-import { colorize } from 'consola/utils';
-
 interface WorkerProcess {
     logPrefix: string;
     subprocess: Subprocess<'ignore', 'inherit', 'inherit'>;
@@ -39,7 +37,7 @@ function createAndSetWorker(index: number) {
     });
 
     workerProcesses[index] = {
-        logPrefix: colorize('cyan', `[Worker ${index} (${subprocess.pid})]`),
+        logPrefix: `[Worker ${index} (${subprocess.pid})]`,
         subprocess,
     };
 }
