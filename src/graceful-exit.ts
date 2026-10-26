@@ -18,9 +18,13 @@ export function gracefulExit(server?: Server<any>) {
             try {
                 await withTimeout(
                     async () => {
-                        await server?.stop();
+                        const errors: unknown[] = [];
+
+                        await server?.stop().catch((error) => errors.push(error));
 
                         // Close application-owned resources here, after requests have drained.
+
+                        if (errors.length) throw new AggregateError(errors, 'Resource cleanup failed');
                     },
                     30 * 1000,
                     { signal: timeoutController.signal },
