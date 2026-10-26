@@ -1,15 +1,38 @@
 import type { Server } from 'bun';
 
-let isGracefulExitStarted = false;
+import { withTimeout } from 'es-toolkit/promise';
 
-export async function gracefulExit(server?: Server<any>) {
-    if (isGracefulExitStarted) return;
-    isGracefulExitStarted = true;
-    logger.info('Starting graceful shutdown...');
-    await server?.stop();
+// Constants/Variables
+let shutdownPromise: Promise<void> | undefined;
 
-    // Perform operations such as closing the database connection here.
+// Functions
+export const isShuttingDown = () => !!shutdownPromise;
 
-    logger.success('Graceful shutdown completed');
-    process.exit(0);
+export function gracefulExit(server?: Server<any>) {
+    return shutdownPromise ??= Promise
+        .resolve()
+        .then(async () => {
+            const timeoutController = new AbortController();
+            logger.info('Starting graceful shutdown...');
+
+            try {
+                await withTimeout(
+                    async () => {
+                        await server?.stop();
+
+                        // Close application-owned resources here, after requests have drained.
+                    },
+                    30 * 1000,
+                    { signal: timeoutController.signal },
+                );
+            } finally {
+                timeoutController.abort();
+            }
+
+            logger.success('Graceful shutdown completed');
+        })
+        .catch((error) => {
+            logger.error('Graceful shutdown failed', error);
+            process.exit(1);
+        });
 }
