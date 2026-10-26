@@ -1,20 +1,46 @@
 import type { Server } from 'bun';
 
 import { redisClient } from '@kcs-project/pack/connections/redis';
+import { withTimeout } from 'es-toolkit/promise';
 import mongoose from 'mongoose';
 
-let isGracefulExitStarted = false;
+// Constants/Variables
+let shutdownPromise: Promise<void> | undefined;
 
-export async function gracefulExit(server?: Server<any>) {
-    if (isGracefulExitStarted) return;
-    isGracefulExitStarted = true;
-    logger.info('Starting graceful shutdown...');
-    await server?.stop();
+// Functions
+export const isShuttingDown = () => !!shutdownPromise;
 
-    // Perform operations such as closing the database connection here.
-    redisClient.close();
-    await mongoose.disconnect();
+export function gracefulExit(server?: Server<any>) {
+    return shutdownPromise ??= Promise
+        .resolve()
+        .then(async () => {
+            const timeoutController = new AbortController();
+            logger.info('Starting graceful shutdown...');
 
-    logger.success('Graceful shutdown completed');
-    process.exit(0);
+            try {
+                await withTimeout(
+                    async () => {
+                        const errors: unknown[] = [];
+
+                        await server?.stop().catch((error) => errors.push(error));
+
+                        // Close application-owned resources here, after requests have drained.
+                        redisClient.close();
+                        await mongoose.disconnect().catch((error) => errors.push(error));
+
+                        if (errors.length) throw new AggregateError(errors, 'Resource cleanup failed');
+                    },
+                    30 * 1000,
+                    { signal: timeoutController.signal },
+                );
+            } finally {
+                timeoutController.abort();
+            }
+
+            logger.success('Graceful shutdown completed');
+        })
+        .catch((error) => {
+            logger.error('Graceful shutdown failed', error);
+            process.exit(1);
+        });
 }
