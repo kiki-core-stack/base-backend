@@ -16,15 +16,15 @@
   },
   "dependencies": {
     "@kikiutils/shared": "^19.0.0",
-    "es-toolkit": "^1.52.0",
-    "hono": "^4.13.13",
+    "es-toolkit": "^1.53.0",
+    "hono": "^4.13.14",
     "zod": "^4.6.7"
   },
   "devDependencies": {
     "@antfu/eslint-config": "^10.0.0",
     "@asteasolutions/zod-to-openapi": "^9.1.0",
     "@hono/swagger-ui": "^0.6.1",
-    "@kikiutils/eslint-config": "^9.3.1",
+    "@kikiutils/eslint-config": "^9.3.2",
     "@kikiutils/tsconfigs": "^7.0.0",
     "@scalar/hono-api-reference": "^0.12.14",
     "@types/bun": "^1.4.4",
