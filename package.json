@@ -39,6 +39,7 @@
     "unimport": "^7.0.2"
   },
   "overrides": {
+    "@types/node": "^26.0.0",
     "typescript": "^6.0.3"
   }
 }
