@@ -140,6 +140,8 @@ async function collectFileExportsRecursively(filePath: string, visitedFiles: Set
                 }
 
                 break;
+            case 'default':
+                break;
             case 'named': {
                 if (!esmExport.specifier) {
                     for (const name of esmExport.names) {

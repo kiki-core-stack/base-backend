@@ -29,6 +29,7 @@ function createAndSetWorker(index: number) {
             else if (exitCode !== null) logger.info(logPrefix, `Exited with code ${exitCode}`);
             else if (signalCode !== null) logger.info(logPrefix, `Exited with signal ${signalCode}`);
             else logger.info(logPrefix, 'Exited with unknown reason');
+
             if (shutdownPromise) return logger.info(logPrefix, 'Main process shutting down... do not restart');
             logger.info(logPrefix, 'Restarting in 1 second...');
             setTimeout(() => !shutdownPromise && createAndSetWorker(index), 1000);
@@ -100,9 +101,9 @@ process.once(
     },
 );
 
-process.once('SIGINT', () => shutdown('SIGINT'));
-process.once('SIGTERM', () => shutdown('SIGTERM'));
-process.once('SIGUSR2', () => shutdown('SIGUSR2'));
+process.once('SIGINT', () => void shutdown('SIGINT'));
+process.once('SIGTERM', () => void shutdown('SIGTERM'));
+process.once('SIGUSR2', () => void shutdown('SIGUSR2'));
 process.once('uncaughtException', handleFatalError);
 process.once('unhandledRejection', handleFatalError);
 
