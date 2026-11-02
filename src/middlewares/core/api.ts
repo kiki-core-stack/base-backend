@@ -15,8 +15,8 @@ function createApiSuccessResponse<D extends object | undefined = undefined>(this
 
 honoApp.use(
     '/api/*',
-    (ctx, next) => {
+    async (ctx, next) => {
         ctx.createApiSuccessResponse = createApiSuccessResponse.bind(ctx);
-        return next();
+        return await next();
     },
 );
