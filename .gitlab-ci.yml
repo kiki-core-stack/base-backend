@@ -183,6 +183,7 @@ lint:
   extends: .bun-check-job
 
   script:
+    - bun run bootstrap:dev
     - bun run lint
 
 typecheck:
