@@ -23,14 +23,14 @@ function createAndSetWorker(index: number) {
             index.toString(),
             '--is-subprocess',
         ],
-        onExit(subprocess, exitCode, signalCode, error) {
+        async onExit(subprocess, exitCode, signalCode, error) {
             const logPrefix = `[Worker ${index} (${subprocess.pid})]`;
             if (error) logger.error(logPrefix, `Exited due to error: ${error.message}\n`, error);
             else if (exitCode !== null) logger.info(logPrefix, `Exited with code ${exitCode}`);
             else if (signalCode !== null) logger.info(logPrefix, `Exited with signal ${signalCode}`);
             else logger.info(logPrefix, 'Exited with unknown reason');
 
-            if (shutdownPromise) return logger.info(logPrefix, 'Main process shutting down... do not restart');
+            if (shutdownPromise) return await logger.info(logPrefix, 'Main process shutting down... do not restart');
             logger.info(logPrefix, 'Restarting in 1 second...');
             setTimeout(() => !shutdownPromise && createAndSetWorker(index), 1000);
         },
@@ -55,12 +55,12 @@ function handleFatalError(error: unknown) {
     }
 }
 
-function shutdown(signal: NodeJS.Signals = 'SIGTERM') {
-    return shutdownPromise ??= Promise
+async function shutdown(signal: NodeJS.Signals = 'SIGTERM') {
+    return await (shutdownPromise ??= Promise
         .resolve()
-        .then(() => {
+        .then(async () => {
             const timeoutController = new AbortController();
-            return withTimeout(
+            return await withTimeout(
                 async () => {
                     logger.info('Shutting down all workers...');
                     const results = await Promise.allSettled(workerProcesses.map(async (workerProcess) => {
@@ -84,7 +84,7 @@ function shutdown(signal: NodeJS.Signals = 'SIGTERM') {
         .catch((error) => {
             logger.error('Worker shutdown failed', error);
             process.exit(1);
-        });
+        }));
 }
 
 // exit listeners must be synchronous. Never leave child processes behind.
