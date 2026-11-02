@@ -25,9 +25,9 @@ function handleFatalError(error: unknown) {
 }
 
 // Register events and signals
-process.once('SIGINT', () => gracefulExit(server));
-process.once('SIGTERM', () => gracefulExit(server));
-process.once('SIGUSR2', () => gracefulExit(server));
+process.once('SIGINT', () => void gracefulExit(server));
+process.once('SIGTERM', () => void gracefulExit(server));
+process.once('SIGUSR2', () => void gracefulExit(server));
 process.once('uncaughtException', handleFatalError);
 process.once('unhandledRejection', handleFatalError);
 
