@@ -23,8 +23,8 @@ COPY ./.env.production.local ./build.ts ./eslint.config.mjs ./.gitignore ./tscon
 COPY ./src ./src
 
 ## Validate and build the application, then prune development dependencies
-RUN bun run lint && \
-    bun run bootstrap:prod && \
+RUN bun run bootstrap:prod && \
+    bun run lint && \
     bun run typecheck && \
     bun run build && \
     bun prune --production
