@@ -15,10 +15,7 @@ import { findExports } from 'mlly';
 import { createUnimport } from 'unimport';
 import type { Import } from 'unimport';
 
-import {
-    projectRoot,
-    projectSrcDirPath,
-} from '../../constants/paths';
+import * as corePaths from '../../constants/paths';
 import { logger } from '../../logger';
 
 interface AutoImportsOptions {
@@ -45,7 +42,7 @@ const dtsFileHeader = `
 
 `.trimStart();
 
-const dtsFilePath = join(projectSrcDirPath, 'core/.generated/auto-imports.d.ts');
+const dtsFilePath = join(corePaths.projectSrcDir, 'core/.generated/auto-imports.d.ts');
 
 // Functions
 export function autoImports(options: Partial<AutoImportsOptions>) {
@@ -62,7 +59,7 @@ export function autoImports(options: Partial<AutoImportsOptions>) {
             // Normalize explicit imports
             const normalizedImports = resolvedOptions.imports.map((importDefinition) => ({
                 ...importDefinition,
-                from: normalizeImportPath(importDefinition.from, projectRoot),
+                from: normalizeImportPath(importDefinition.from, corePaths.projectRoot),
             }));
 
             // Collect and parse source files
@@ -99,7 +96,7 @@ export function autoImports(options: Partial<AutoImportsOptions>) {
             builder.onLoad(
                 {
                     filter: new RegExp(
-                        `${escapeRegExp(projectSrcDirPath)}.*${allowedExtensionsRegexpString}$`,
+                        `${escapeRegExp(corePaths.projectSrcDir)}.*${allowedExtensionsRegexpString}$`,
                         'i',
                     ),
                 },
@@ -210,9 +207,9 @@ async function collectMatchedFiles(globPatterns: string[]) {
     const matchedFiles = new Set<string>();
     await Promise.all(
         globPatterns.filter(isEligibleSourceFile).map(async (pattern) => {
-            const scanner = new Glob(normalizeImportPath(pattern, projectRoot)).scan({
+            const scanner = new Glob(normalizeImportPath(pattern, corePaths.projectRoot)).scan({
                 absolute: true,
-                cwd: projectSrcDirPath,
+                cwd: corePaths.projectSrcDir,
                 onlyFiles: true,
             });
 
@@ -240,7 +237,7 @@ function isEligibleSourceFile(filePath: string) {
 }
 
 function normalizeImportPath(path: string, relativePath: string) {
-    if (path.startsWith('@/')) return join(projectSrcDirPath, path.substring(2));
+    if (path.startsWith('@/')) return join(corePaths.projectSrcDir, path.substring(2));
     if (path.startsWith('.') && !isAbsolute(path)) return resolve(relativePath, path);
     return path;
 }

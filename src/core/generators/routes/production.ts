@@ -1,6 +1,6 @@
 import { resolveModuleExportNames } from 'mlly';
 
-import { productionRoutesLoaderPath } from '../../constants/paths';
+import * as corePaths from '../../constants/paths';
 import { discoverRouteDefinitions } from '../../libs/router';
 import { logger } from '../../logger';
 import type { RouteDefinition } from '../../types/route';
@@ -59,7 +59,7 @@ const outputLines = [
     ...registrationLines,
 ];
 
-await Bun.write(productionRoutesLoaderPath, `${outputLines.join('\n').trim()}\n`);
+await Bun.write(corePaths.productionRoutesLoader, `${outputLines.join('\n').trim()}\n`);
 logger.success(
     `Generated ${registrationLines.length} production routes in ${(performance.now() - startTime).toFixed(2)}ms`,
 );
