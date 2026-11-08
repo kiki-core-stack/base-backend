@@ -1,6 +1,9 @@
 import { statusCodeToApiResponseErrorCodeMap } from '@kcs-project/pack/hono-backend/constants/response';
 import type { ContentfulStatusCode } from 'hono/utils/http-status';
-import type { Except } from 'type-fest';
+import type {
+    Arrayable,
+    Except,
+} from 'type-fest';
 import type { ZodObject } from 'zod';
 
 import type { RouteZodOpenApiConfig } from '@/core/types/zod-openapi';
@@ -8,7 +11,7 @@ import type { RouteZodOpenApiConfig } from '@/core/types/zod-openapi';
 export function defineApiRouteZodOpenApiConfig(
     operationId: string,
     description: string,
-    tags: string | string[],
+    tags: Arrayable<string>,
     config: Except<RouteZodOpenApiConfig, 'description' | 'operationId' | 'tags'>,
 ): RouteZodOpenApiConfig {
     return {
