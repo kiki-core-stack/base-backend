@@ -1,8 +1,11 @@
-import type { Except } from 'type-fest';
+import type {
+    ArrayValues,
+    Except,
+} from 'type-fest';
 
 import type { allowedRouteHttpMethods } from '../constants/route';
 
-export type RouteHttpMethod = (typeof allowedRouteHttpMethods)[number];
+export type RouteHttpMethod = ArrayValues<typeof allowedRouteHttpMethods>;
 
 export interface Route {
     handlerProperties?: RouteHandlerProperties;

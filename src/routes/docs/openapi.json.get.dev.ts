@@ -1,11 +1,11 @@
 import { OpenApiGeneratorV32 } from '@asteasolutions/zod-to-openapi';
+import { objectEntries } from 'ts-extras';
 
 import { zodOpenApiRegistry } from '@/core/constants/zod-openapi';
 
 const tagToDescriptionMap: Record<string, string> = {};
 
-const tags = Object
-    .entries(tagToDescriptionMap)
+const tags = objectEntries(tagToDescriptionMap)
     .map((entry) => ({
         description: entry[1],
         name: entry[0],

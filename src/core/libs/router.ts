@@ -1,6 +1,9 @@
 import { glob } from 'node:fs/promises';
 
-import type { WritableDeep } from 'type-fest';
+import type {
+    ArrayValues,
+    WritableDeep,
+} from 'type-fest';
 
 import { honoApp } from '../app';
 import * as corePaths from '../constants/paths';
@@ -31,7 +34,7 @@ export async function discoverRouteDefinitions() {
         const normalizedRoutePath = matches[1]!.replaceAll(/\/+/g, '/') || '/';
         routeDefinitions.push({
             filePath,
-            method: matches[3] as typeof allowedRouteHttpMethods[number],
+            method: matches[3] as ArrayValues<typeof allowedRouteHttpMethods>,
             openApiPath: normalizedRoutePath.replaceAll(/\[([^/]+)\]/g, '{$1}'),
             path: normalizedRoutePath.replaceAll(/\[([^/]+)\]/g, ':$1'),
         });
