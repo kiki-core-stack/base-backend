@@ -1,6 +1,9 @@
+export * as apiErrors from '@/api-errors';
+
 export * as WsIoEventNames from '@kcs-project/pack/constants/ws.io-event-names';
-export { throwApiError } from '@kcs-project/pack/hono-backend/libs/api';
-export { apiZValidator } from '@kcs-project/pack/hono-backend/libs/api/zod-validator';
+export { apiErrorResponses } from '@kcs-project/pack/hono-backend/libs/api/docs';
+export { throwApiError } from '@kcs-project/pack/hono-backend/libs/api/error';
+export { apiValidator } from '@kcs-project/pack/hono-backend/libs/api/validator';
 export * as z from '@kcs-project/pack/libs/zod/backend';
 export * as lruStore from '@kcs-project/pack/stores/lru';
 export * as redisStore from '@kcs-project/pack/stores/redis';

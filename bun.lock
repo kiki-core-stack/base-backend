@@ -11,6 +11,7 @@
         "es-toolkit": "^1.53.2",
         "hono": "^4.13.17",
         "hono-openapi": "^1.5.0",
+        "mongoose": "^9.12.1",
         "nanoid": "^6.0.2",
         "node-ciphers": "^6.1.5",
         "on-change": "^6.0.2",

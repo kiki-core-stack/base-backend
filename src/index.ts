@@ -1,10 +1,8 @@
-import '@kcs-project/pack/hono-backend/setups/mongoose-model-statics';
+import '@/setups';
 
 import type { Server } from 'bun';
 import { writeSync } from 'node:fs';
 import { inspect } from 'node:util';
-
-import { setupHonoAppErrorHandling } from '@kcs-project/pack/hono-backend/setups/error-handling';
 
 import { honoApp } from '@/core/app';
 import {
@@ -36,9 +34,6 @@ process.once('unhandledRejection', handleFatalError);
 // Import environment-specific runtime initializers.
 // Used for applying side effects like dev-only tooling, schema extensions, etc.
 await import(`@/runtime-inits/${process.env.NODE_ENV}`);
-
-// Setup error handling
-setupHonoAppErrorHandling(honoApp, logger);
 
 // Initialize system startup
 await (await import('@kcs-project/pack/init')).initializeSystemStartup();
