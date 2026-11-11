@@ -1,65 +1,31 @@
-import { resolveModuleExportNames } from 'mlly';
-
 import * as corePaths from '../../constants/paths';
-import { discoverRouteDefinitions } from '../../libs/router';
+import { discoverRouteDefinitions } from '../../libs/router/discovery';
 import { logger } from '../../logger';
-import type { RouteDefinition } from '../../types/route';
-
-// Constants/Variables
-const importStatements: string[] = [];
-const constantDeclarations: string[] = [];
-let constNameCounter = 0;
-const usedConstNames = new Set<string>();
-const valueToConstMap = new Map<string, string>();
 
 // Functions
-async function buildRouteRegistrationSnippet(routeDefinition: RouteDefinition, index: number) {
-    const moduleExports = await resolveModuleExportNames(routeDefinition.filePath);
-    if (!moduleExports.includes('default')) {
-        throw new Error(`No default export found in route at ${routeDefinition.filePath}`);
-    }
-
-    const importAlias = `r${index}`;
-    importStatements.push(`import * as ${importAlias} from '${routeDefinition.filePath}';`);
-    const methodConstName = getOrCreateConstName(routeDefinition.method);
-    const pathConstName = getOrCreateConstName(routeDefinition.path);
-
-    let registration = `await registerRoute(${methodConstName}, ${pathConstName}, normalizeRouteHandlers(${importAlias}.default),`;
-    if (moduleExports.includes('routeHandlerOptions')) registration += ` ${importAlias}.routeHandlerOptions,`;
-
-    return `${registration.replace(/,\s*$/, '')});`;
-}
-
-function getOrCreateConstName(value: string) {
-    if (valueToConstMap.has(value)) return valueToConstMap.get(value)!;
-
-    let constName: string;
-    do constName = `c${constNameCounter++}`;
-    while (usedConstNames.has(constName));
-
-    constantDeclarations.push(`const ${constName} = '${value}';`);
-    usedConstNames.add(constName);
-    valueToConstMap.set(value, constName);
-
-    return constName;
-}
+const toSingleQuotedString = (value: string) => `'${value.replaceAll('\\', '\\\\').replaceAll('\'', '\\\'')}'`;
 
 // Entrypoint
 const startTime = performance.now();
 logger.info('Generating production routes loader...');
-const registrationLines = await Promise.all((await discoverRouteDefinitions()).map(buildRouteRegistrationSnippet));
+const routeDefinitions = await discoverRouteDefinitions();
 const outputLines = [
-    '// @ts-nocheck',
-    `import { normalizeRouteHandlers, registerRoute } from '../../libs/router';`,
+    '// Auto-generated. Do not edit manually.',
+    `import { registerRoutes } from '../../libs/router/registry';`,
     '',
-    ...importStatements,
+    ...routeDefinitions.map((routeDefinition, index) => `import * as r${index} from ${toSingleQuotedString(routeDefinition.filePath)};`),
     '',
-    ...constantDeclarations,
-    '',
-    ...registrationLines,
+    'registerRoutes([',
+    ...routeDefinitions.map((routeDefinition, index) => [
+        '    {',
+        `        filePath: ${toSingleQuotedString(corePaths.projectSrcDir.relative(routeDefinition.filePath).value)},`,
+        `        method: '${routeDefinition.method}',`,
+        `        module: r${index},`,
+        `        path: ${toSingleQuotedString(routeDefinition.path)},`,
+        '    },',
+    ].join('\n')),
+    ']);',
 ];
 
-await Bun.write(corePaths.productionRoutesLoader, `${outputLines.join('\n').trim()}\n`);
-logger.success(
-    `Generated ${registrationLines.length} production routes in ${(performance.now() - startTime).toFixed(2)}ms`,
-);
+await corePaths.productionRoutesLoader.writeFile(`${outputLines.join('\n')}\n`);
+logger.success(`Generated ${routeDefinitions.length} production routes in ${(performance.now() - startTime).toFixed(2)}ms`);
