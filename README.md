@@ -28,6 +28,7 @@
 - globals/：被 auto-imports 注入成全域的 API。
   - route.ts：defineRoute。
   - re-exports.ts：routeValidator（hono-openapi 的 validator）、useRouteMiddleware、logger、z。
+  - request.ts：getClientIp，依 SERVER_TRUSTED_PROXIES（預設信任內網位址）解析 X-Forwarded-For 取得 client IP。
 - libs/router/
   - discovery.ts：掃描 routes/ 目錄，轉成 method 和 path，並排序。
   - registry.ts：組出每條路由的 middleware 鏈並註冊到 Hono，檢查重複路由，提供 useRouteMiddleware。
