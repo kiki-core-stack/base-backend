@@ -1,48 +1,34 @@
-import {
-    discoverRouteDefinitions,
-    normalizeRouteHandlers,
-    registerRoute,
-} from '../../libs/router';
+import { discoverRouteDefinitions } from '../../libs/router/discovery';
+import { registerRoute } from '../../libs/router/registry';
+import { logger } from '../../logger';
 
 // Entrypoint
 const startTime = performance.now();
 const routeDefinitions = await discoverRouteDefinitions();
-const loadedRouteModules = await Promise.all(
+const routeModules = await Promise.all(
     routeDefinitions.map(async (routeDefinition) => {
         try {
-            return {
-                ...routeDefinition,
-                module: await import(routeDefinition.filePath),
-            };
+            return await import(routeDefinition.filePath);
         } catch (error) {
             logger.error(`Failed to import route at ${routeDefinition.filePath}: ${(error as Error).message}\n`, error);
         }
     }),
 );
 
-let loadedRouteCount = 0;
-for (const routeEntry of loadedRouteModules.filter((loadedRouteModule) => loadedRouteModule !== undefined)) {
-    const handlers = normalizeRouteHandlers(routeEntry.module.default);
-    if (!handlers.length) {
-        logger.warn(`No handler found for route at ${routeEntry.filePath}`);
-        continue;
+let registeredRouteCount = 0;
+for (const [index, routeDefinition] of routeDefinitions.entries()) {
+    const module = routeModules[index];
+    if (!module) continue;
+    try {
+        registerRoute({
+            ...routeDefinition,
+            module,
+        });
+
+        registeredRouteCount++;
+    } catch (error) {
+        logger.error((error as Error).message);
     }
-
-    const zodOpenApiConfig = routeEntry.module.zodOpenApiConfig;
-    await registerRoute(
-        routeEntry.method,
-        routeEntry.path,
-        handlers,
-        routeEntry.module.routeHandlerOptions,
-        zodOpenApiConfig
-            ? {
-                config: zodOpenApiConfig,
-                path: routeEntry.openApiPath,
-            }
-            : undefined,
-    );
-
-    loadedRouteCount++;
 }
 
-logger.success(`Registered ${loadedRouteCount} routes in ${(performance.now() - startTime).toFixed(2)}ms`);
+logger.success(`Registered ${registeredRouteCount} routes in ${(performance.now() - startTime).toFixed(2)}ms`);

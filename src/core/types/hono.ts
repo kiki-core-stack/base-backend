@@ -1,9 +1,10 @@
-import type { H } from 'hono/types';
-
-import type { RouteHandlerProperties } from './route';
+import type { RegisteredRoute } from './route';
 
 declare module 'hono' {
-    interface Context {
-        routeHandler?: H & RouteHandlerProperties;
+    interface ContextVariableMap {
+        /**
+         * Set for requests matched by a registered file route; unavailable in app-level middlewares and 404 handling.
+         */
+        route: RegisteredRoute;
     }
 }

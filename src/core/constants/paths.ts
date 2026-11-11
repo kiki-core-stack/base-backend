@@ -2,14 +2,10 @@
  * All paths are for development only.
  */
 
-import {
-    join,
-    resolve,
-    sep,
-} from 'node:path';
+import { Path } from '@kikiutils/shared/classes/path';
 
-export const projectRoot = /* @__PURE__ */ resolve(import.meta.dirname, '../../../').replaceAll(sep, '/');
-export const projectDistDir = /* @__PURE__ */ join(projectRoot, 'dist');
-export const projectSrcDir = /* @__PURE__ */ join(projectRoot, 'src');
-export const productionRoutesLoader = /* @__PURE__ */ join(projectSrcDir, 'core/loaders/routes/production.ts');
-export const routesDir = /* @__PURE__ */ join(projectSrcDir, 'routes');
+export const projectRoot = Path.resolve(import.meta.dirname, '../../../');
+export const projectDistDir = projectRoot.join('dist');
+export const projectSrcDir = projectRoot.join('src');
+export const productionRoutesLoader = projectSrcDir.join('core/loaders/routes/production.ts');
+export const routesDir = projectSrcDir.join('routes');

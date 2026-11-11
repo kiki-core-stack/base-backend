@@ -1,27 +1,61 @@
 import type {
-    ArrayValues,
-    Except,
-} from 'type-fest';
+    Context,
+    Next,
+} from 'hono';
+import type { DescribeRouteOptions } from 'hono-openapi';
+import type { ArrayValues } from 'type-fest';
+import type * as z from 'zod';
 
-import type { allowedRouteHttpMethods } from '../constants/route';
+import type {
+    allowedRouteHttpMethods,
+    routeMetaSymbol,
+} from '../constants/route';
 
+export type RouteHandlers = unknown[] & { readonly [routeMetaSymbol]: RouteMeta };
 export type RouteHttpMethod = ArrayValues<typeof allowedRouteHttpMethods>;
+export type RouteMetaArgs = Partial<RouteMeta> extends RouteMeta ? [meta?: RouteMeta] : [meta: RouteMeta];
+export type RouteMiddlewareHandler = (
+    ctx: Context,
+    route: RegisteredRoute,
+    next: Next,
+) => Promise<Response | void> | Response | void;
 
-export interface Route {
-    handlerProperties?: RouteHandlerProperties;
+export interface RegisteredRoute extends RouteDefinition {
+    meta: RouteMeta;
 }
 
 export interface RouteDefinition {
     filePath: string;
     method: RouteHttpMethod;
-    openApiPath: string;
     path: string;
 }
 
-export interface RouteHandlerOptions {
-    properties?: Except<RouteHandlerProperties, 'isHandler'>;
+export interface RouteDocs extends Omit<DescribeRouteOptions, 'responses'> {
+    /**
+     * Response docs keyed by status code. A schema alone documents an `application/json` response.
+     */
+    responses?: Partial<Record<'default' | number, RouteDocsResponse | z.ZodType>>;
 }
 
-export interface RouteHandlerProperties {
-    readonly isHandler?: true;
+export interface RouteDocsResponse {
+    /**
+     * @defaultValue 'application/json'
+     */
+    contentType?: string;
+    description?: string;
+    schema?: z.ZodType;
+}
+
+/**
+ * Per-route metadata passed to `defineRoute(meta)`.
+ *
+ * Extend it with declaration merging. Required fields added downstream make the
+ * `defineRoute` argument required as well.
+ */
+export interface RouteMeta {
+    docs?: RouteDocs;
+}
+
+export interface RouteModuleEntry extends RouteDefinition {
+    module: { readonly default?: unknown };
 }
