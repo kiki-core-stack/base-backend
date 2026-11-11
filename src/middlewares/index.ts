@@ -4,4 +4,5 @@
 // - useRouteMiddleware(pattern, handler): route-level middlewares; run only for matched file routes and receive the
 //   route meta. They must be registered here, before routes are loaded.
 
+await import('./core/request-id');
 if (process.env.NODE_ENV === 'development') await import('./core/logger');
