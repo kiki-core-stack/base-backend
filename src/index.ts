@@ -46,6 +46,8 @@ if (!isShuttingDown()) {
     server = Bun.serve({
         fetch: honoApp.fetch,
         hostname: process.env.SERVER_HOST || '127.0.0.1',
+        idleTimeout: 10,
+        maxRequestBodySize: 128 * 1024 * 1024,
         port: Number(process.env.SERVER_PORT) || 8080,
         reusePort: true,
     });
