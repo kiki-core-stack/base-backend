@@ -26,8 +26,8 @@
   - route.ts：RouteMeta（可用 declaration merging 擴充）、RouteDocs 等路由型別。
   - hono.ts：在 ContextVariableMap 宣告 route。
 - globals/：被 auto-imports 注入成全域的 API。
-  - route.ts：defineRoute、validator。
-  - re-exports.ts：useRouteMiddleware、logger、z。
+  - route.ts：defineRoute。
+  - re-exports.ts：routeValidator（hono-openapi 的 validator）、useRouteMiddleware、logger、z。
 - libs/router/
   - discovery.ts：掃描 routes/ 目錄，轉成 method 和 path，並排序。
   - registry.ts：組出每條路由的 middleware 鏈並註冊到 Hono，檢查重複路由，提供 useRouteMiddleware。

@@ -6,8 +6,6 @@ import type {
     RouteMetaArgs,
 } from '../types/route';
 
-export { validator } from 'hono-openapi';
-
 type CreateHandlers = ReturnType<typeof createFactory>['createHandlers'];
 
 // Functions
