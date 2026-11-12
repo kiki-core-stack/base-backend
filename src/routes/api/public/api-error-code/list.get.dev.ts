@@ -1,8 +1,4 @@
-import { objectValues } from 'ts-extras';
+import { listApiErrorCodes } from '@kcs-project/pack/hono-backend/libs/api/error';
 
 // Development only: frontends generate their error code types from this list.
-export default defineRoute()((ctx) => ctx.createApiSuccessResponse({
-    codes: objectValues(apiErrors)
-        .flatMap((namespace) => objectValues(namespace).map((definition) => definition.code))
-        .toSorted(),
-}));
+export default defineRoute()((ctx) => ctx.createApiSuccessResponse({ codes: listApiErrorCodes(apiErrors) }));
