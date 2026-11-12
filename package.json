@@ -16,7 +16,7 @@
   },
   "dependencies": {
     "@hono/standard-validator": "^0.4.1",
-    "@kcs-project/pack": "git+https://github.com/kiki-core-stack/pack#4c5e939cd9eb91d3ad51f850f36f48c7ccf1dfc4",
+    "@kcs-project/pack": "git+https://github.com/kiki-core-stack/pack#71f728e335479940ed377b92f951de3812671aeb",
     "@kikiutils/mongoose": "^9.0.3",
     "@kikiutils/shared": "^20.1.1",
     "es-toolkit": "^1.53.2",
@@ -35,7 +35,7 @@
     "@hono/swagger-ui": "^0.6.2",
     "@kikiutils/eslint-config": "^11.0.1",
     "@kikiutils/tsconfigs": "^7.0.0",
-    "@scalar/hono-api-reference": "^0.12.18",
+    "@scalar/hono-api-reference": "^0.12.19",
     "@types/bun": "^1.4.4",
     "eslint": "^10.14.0",
     "knip": "^6.44.2",
