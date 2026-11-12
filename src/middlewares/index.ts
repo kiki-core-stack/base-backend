@@ -7,4 +7,4 @@
 await import('./core/request-id');
 if (process.env.NODE_ENV === 'development') await import('./core/logger');
 
-await import('./context/session');
+await import('./context/cookie-session');
