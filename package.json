@@ -15,12 +15,11 @@
     "typecheck": "tsc"
   },
   "dependencies": {
-    "@hono/standard-validator": "^0.4.1",
-    "@kcs-project/pack": "git+https://github.com/kiki-core-stack/pack#71f728e335479940ed377b92f951de3812671aeb",
+    "@kcs-project/pack": "git+https://github.com/kiki-core-stack/pack#4303139849c53da8164a20714c228b669d234672",
     "@kikiutils/mongoose": "^9.0.3",
     "@kikiutils/shared": "^20.1.1",
     "es-toolkit": "^1.53.2",
-    "hono": "^4.13.17",
+    "hono": "^4.13.18",
     "hono-openapi": "^1.5.0",
     "mongoose": "^9.12.1",
     "nanoid": "^6.0.2",
@@ -38,7 +37,7 @@
     "@scalar/hono-api-reference": "^0.12.19",
     "@types/bun": "^1.4.4",
     "eslint": "^10.14.0",
-    "knip": "^6.44.2",
+    "knip": "^6.45.1",
     "mlly": "^1.8.2",
     "nodemon": "^3.1.14",
     "pretty-bytes": "^7.2.0",
