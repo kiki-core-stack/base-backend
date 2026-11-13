@@ -1,13 +1,13 @@
 import {
-    createCookieSession,
+    cookieSession,
     createCookieTokenHandler,
-} from '@kcs-project/pack/hono-backend/libs/cookie-session';
+} from '@kcs-project/pack/hono-backend/middlewares/cookie-session';
 
 import { honoApp } from '@/core/app';
 
 honoApp.use(
     '/api/*',
-    createCookieSession({
+    cookieSession({
         keys: checkAndGetEnvValue('COOKIE_SESSION_KEYS'),
         tokenHandler: createCookieTokenHandler(),
     }),

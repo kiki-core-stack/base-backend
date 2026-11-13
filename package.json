@@ -15,9 +15,9 @@
     "typecheck": "tsc"
   },
   "dependencies": {
-    "@kcs-project/pack": "git+https://github.com/kiki-core-stack/pack#4303139849c53da8164a20714c228b669d234672",
+    "@kcs-project/pack": "git+https://github.com/kiki-core-stack/pack#7962e588b143ede96e738befd405829504120f9c",
     "@kikiutils/mongoose": "^9.0.3",
-    "@kikiutils/shared": "^20.1.1",
+    "@kikiutils/shared": "^20.1.2",
     "es-toolkit": "^1.53.2",
     "hono": "^4.13.18",
     "hono-openapi": "^1.5.0",
@@ -34,7 +34,7 @@
     "@hono/swagger-ui": "^0.6.2",
     "@kikiutils/eslint-config": "^11.0.1",
     "@kikiutils/tsconfigs": "^7.0.0",
-    "@scalar/hono-api-reference": "^0.12.19",
+    "@scalar/hono-api-reference": "^0.12.20",
     "@types/bun": "^1.4.4",
     "eslint": "^10.14.0",
     "knip": "^6.45.1",
