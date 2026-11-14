@@ -1,6 +1,6 @@
 # base-backend 架構
 
-在 auto-hono（[docs/auto-hono.md](./auto-hono.md)）之上接入 pack：錯誤處理與錯誤碼、多語系、cookie session、MongoDB 與 Redis、啟動初始化。共用規則（API 回應格式、錯誤碼、多語系、權限）見 pack README。以下只列本 repo 增加或改動的部分。
+在 auto-hono（[docs/auto-hono.md](./auto-hono.md)）之上接入 pack：錯誤處理與錯誤碼、多語系、cookie session、MongoDB 與 Redis、啟動初始化。共用規則（API 回應格式、錯誤碼、多語系、權限）見 [pack README](https://github.com/kiki-core-stack/pack)。以下只列本 repo 增加或改動的部分。
 
 ## 啟動流程
 
