@@ -15,7 +15,7 @@
     "typecheck": "tsc"
   },
   "dependencies": {
-    "@kcs-project/pack": "git+https://github.com/kiki-core-stack/pack#7962e588b143ede96e738befd405829504120f9c",
+    "@kcs-project/pack": "git+https://github.com/kiki-core-stack/pack#e6109f2cb8a2a9d088042f0491e62b8019e64adc",
     "@kikiutils/mongoose": "^9.0.3",
     "@kikiutils/shared": "^20.1.2",
     "es-toolkit": "^1.53.2",
