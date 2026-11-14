@@ -198,6 +198,7 @@ Dockerfile
 
 # Other
 .vscode/
+docs/
 fetch-and-merge.sh
 install-dependencies.sh
 LICENSE
