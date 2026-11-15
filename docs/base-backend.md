@@ -29,5 +29,5 @@ src/index.ts 在 auto-hono 的流程上增加：
 
 `.env.development`（複製為 `.env.development.local`）比 auto-hono 多：
 
-- `COOKIE_SESSION_KEYS`：base64 編碼的 32 bytes 金鑰，以逗號分隔輪替（第一把用於加密）；產生方式見檔內註解。
+- `COOKIE_SESSION_KEYS`：至少 32 bytes 的任意字串（不可含逗號，pack 以 HKDF-SHA256 轉成 AES-256 金鑰），以逗號分隔輪替（第一把用於加密）；產生方式見檔內註解。
 - `MONGODB_URI`（需 replica set）、`REDIS_URL`（需支援 RESP3）。
