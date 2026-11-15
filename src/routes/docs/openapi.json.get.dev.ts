@@ -12,5 +12,7 @@ export default defineRoute()(
             // Tag descriptions, e.g. [{ description: '...', name: '...' }]
             tags: [],
         },
+        // Routes for internal services (e.g. ws.io-server) are not part of the public API.
+        exclude: /^\/api\/internal\//,
     }),
 );
