@@ -17,12 +17,13 @@ src/index.ts 在 auto-hono 的流程上增加：
 ## 新增的目錄與檔案
 
 - api-errors/：錯誤碼命名空間。pack 的 `auth`、`common` 逐一 re-export；本 repo 的錯誤另開命名空間（例如 `export * as forum from './forum';`）。
-- globals/re-exports.ts：自動匯入 pack 與常用工具（`apiErrors`、`throwApiError`、`apiValidator`、`z`、`lruStore`、`redisStore` 等）；`z` 改為 pack 的擴充版本，取代 auto-hono 的 `zod`。
+- globals/re-exports.ts：自動匯入 pack 與常用工具（`apiErrors`、`throwApiError`、`apiValidator`、`throwFieldValidationError`、`apiDocs`、`z`、`lruStore`、`redisStore` 等）；`z` 改為 pack 的擴充版本，取代 auto-hono 的 `zod`。API 路由的驗證一律用 `apiValidator`，不用 auto-hono 的 `routeValidator`，驗證錯誤才會是 API 錯誤格式。
 - middlewares/：
   - core/locale.ts：pack 的 `locale()`，依 `accept-language` 設定 `ctx.var.locale`；排在最前面，讓錯誤與 404 也能翻譯。
   - context/cookie-session.ts：`/api/*` 掛上 pack 的 `cookieSession()`（金鑰為 `COOKIE_SESSION_KEYS`）。
 - types/cookie-session.ts：以 `declare module` 擴充 `CookieSessionData`。
 - routes/api/public/api-error-code/list.get.dev.ts：開發用的錯誤碼清單，供前端 codegen 使用。
+- routes/docs/openapi.json.get.dev.ts：以 `defaultDocs` 為每支有文件的路由加上 `internalServerError`；路由的 `apiDocs.errors(...)` 只列自己會拋出的錯誤。
 
 ## 設定
 

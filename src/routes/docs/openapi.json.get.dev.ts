@@ -2,6 +2,8 @@ import { createOpenApiDocumentHandler } from '@/core/libs/openapi';
 
 export default defineRoute()(
     createOpenApiDocumentHandler({
+        // Every route can fail unexpectedly; routes list only the errors they throw themselves.
+        defaultDocs: { responses: apiDocs.errors(apiErrors.common.internalServerError) },
         documentation: {
             info: {
                 title: 'API Document',
