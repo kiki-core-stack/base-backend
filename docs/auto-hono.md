@@ -32,7 +32,7 @@
 - libs/router/
   - discovery.ts：掃描 routes/ 目錄，轉成 method 和 path，並排序。
   - registry.ts：組出每條路由的 middleware 鏈並註冊到 Hono，檢查重複路由，提供 useRouteMiddleware。
-- libs/openapi.ts：把 RouteDocs 轉成 hono-openapi 的格式，並提供產生 OpenAPI 文件的 handler；handler 的 `defaultDocs` 會套用到所有有文件的路由（例如每支路由都可能回傳的錯誤），路由自己的同狀態碼回應優先。
+- libs/openapi.ts：把 RouteDocs 轉成 hono-openapi 的格式，並提供產生 OpenAPI 文件的 handler；handler 的 `defaultDocs` 會套用到所有有文件的路由（例如每支路由都可能回傳的錯誤），路由自己的同狀態碼回應優先；其餘選項（例如 `exclude` 排除路徑）原樣交給 hono-openapi。
 - libs/response-validation.ts：開啟 VALIDATE_RESPONSES 時，比對 response 和 schema，不符就印 warning。
 - loaders/routes/
   - development.ts：動態掃描並 import 路由；失敗只記 log，不中斷啟動。
