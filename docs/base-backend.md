@@ -1,6 +1,6 @@
 # base-backend 架構
 
-在 auto-hono（[docs/auto-hono.md](./auto-hono.md)）之上接入 pack：錯誤處理與錯誤碼、多語系、cookie session、MongoDB 與 Redis、啟動初始化。共用規則（API 回應格式、錯誤碼、多語系、權限）見 [pack README](https://github.com/kiki-core-stack/pack)。以下只列本 repo 增加或改動的部分。
+在 auto-hono（[docs/auto-hono.md](./auto-hono.md)）之上接入 pack：錯誤處理與錯誤碼、多語系、cookie session、MongoDB 與 Redis、啟動初始化。共用規則（API 回應格式、錯誤碼、多語系、權限）見 [pack docs](https://github.com/kiki-core-stack/pack/blob/main/docs/pack.md)。以下只列本 repo 增加或改動的部分。
 
 ## 啟動流程
 
@@ -23,7 +23,7 @@ src/index.ts 在 auto-hono 的流程上增加：
   - context/cookie-session.ts：`/api/*` 掛上 pack 的 `cookieSession()`（金鑰為 `COOKIE_SESSION_KEYS`）。
 - types/cookie-session.ts：以 `declare module` 擴充 `CookieSessionData`。
 - routes/api/public/api-error-code/list.get.dev.ts：開發用的錯誤碼清單，供前端 codegen 使用。
-- routes/docs/openapi.json.get.dev.ts：以 `defaultDocs` 為每支有文件的路由加上 `internalServerError`；路由的 `apiDocs.errors(...)` 只列自己會拋出的錯誤。
+- routes/docs/openapi.json.get.dev.ts：以 `defaultDocs` 為每支有文件的路由加上 `internalServerError`，路由的 `apiDocs.responses(...)` 只列自己會拋出的錯誤；`/api/internal/*`（服務之間呼叫）不列入文件。前端以此產生 API client（pack `generateOpenApiClient`）。
 
 ## 設定
 
