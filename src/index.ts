@@ -35,7 +35,6 @@ process.once('unhandledRejection', handleFatalError);
 // Used for applying side effects like dev-only tooling, schema extensions, etc.
 await import(`@/runtime-inits/${process.env.NODE_ENV}`);
 
-// Initialize system startup
 await (await import('@kcs-project/pack/init')).initializeSystemStartup();
 
 // Load middlewares
