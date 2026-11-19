@@ -5,8 +5,8 @@
 ### 啟動流程
 
 - dev：nodemon 執行 core/entrypoints/development.ts，它先載入 core/bootstrap，再載入 src/index.ts。
-- build：core/build.ts 先執行 core/generators/routes/production.ts，產生靜態路由 loader，再用上游的 runBuild 打包到 dist。
-- prod：dist/core/entrypoints/production.js 是 supervisor，會 spawn N 個 worker，每個 worker 都執行 dist/index.js。
+- build：core/build.ts 先執行 core/generators/routes/production.ts，產生靜態路由 loader，再用根目錄 build.ts 的 runBuild 打包到 dist。
+- prod：dist/core/entrypoints/production.js 是 supervisor，會 spawn `SERVER_WORKERS`（預設 4）個 worker，每個 worker 都執行 dist/index.js，以 `reusePort` 共用同一個 port。
 - src/index.ts（兩個環境共用的 app 入口），依序：
   1. 註冊 signal 和錯誤處理
   2. 載入 runtime-inits/${NODE_ENV}
@@ -48,7 +48,7 @@
 
 - routes/**：檔案路由。檔名格式是 name.method[.dev|.prod].ts，[x] 會轉成 :x。寫法是 export default defineRoute(meta)(...handlers)。
   - routes/docs/：OpenAPI JSON、Scalar、Swagger 三個頁面，都是 .dev，可以自由修改或搬移。
-- middlewares/index.ts：用 honoApp.use 註冊 app 層 middleware，或用 useRouteMiddleware 註冊路由層 middleware。
+- middlewares/index.ts：控制 middleware 的註冊條件與順序（預設有 core/request-id，dev 另有 core/logger）。app 層用 honoApp.use，每個請求（含 404）都會執行；路由層用 useRouteMiddleware，只套用到符合 pattern 的檔案路由並拿得到 route meta，必須在載入路由前註冊。
 - plugins/bun/：auto-imports 的 glob 設定，以及 dev 和 prod 各自的 plugin 清單。
 - runtime-inits/：依環境執行的初始化副作用，目前是空的。
 - types/route.ts：擴充 RouteMeta 的預留檔，在這裡加 defineRoute(meta) 的欄位；必填欄位會讓 meta 參數變必填。
