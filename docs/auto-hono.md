@@ -19,29 +19,15 @@
 - app.ts：唯一的 honoApp 實例。
 - logger.ts：logger；在 worker 裡前綴帶 worker 編號。
 - bootstrap/index.ts：依 NODE_ENV 註冊 plugins/bun/* 底下的 Bun plugin。
-- constants/
-  - paths.ts：用 Path 定義的專案路徑，只在開發和 build 時使用。
-  - route.ts：允許的 HTTP method，以及 routeMetaSymbol。
-- types/
-  - route.ts：RouteMeta（可用 declaration merging 擴充）、RouteDocs 等路由型別。
-  - hono.ts：在 ContextVariableMap 宣告 route。
-- globals/：被 auto-imports 注入成全域的 API。
-  - route.ts：defineRoute。
-  - re-exports.ts：routeValidator（hono-openapi 的 validator）、useRouteMiddleware、logger、z。
-  - request.ts：getClientIp，依 SERVER_TRUSTED_PROXIES（預設信任內網位址）解析 X-Forwarded-For 取得 client IP。
-- libs/router/
-  - discovery.ts：掃描 routes/ 目錄，轉成 method 和 path，並排序。
-  - registry.ts：組出每條路由的 middleware 鏈並註冊到 Hono，檢查重複路由，提供 useRouteMiddleware。
+- constants/：專案路徑（只在開發和 build 時使用）、允許的 HTTP method。
+- types/：路由型別（RouteMeta 可用 declaration merging 擴充）；ContextVariableMap 的 route 只在符合的檔案路由中存在，app 層 middleware 與 404 拿不到。
+- globals/：被 auto-imports 注入成全域的 API（defineRoute、routeValidator、useRouteMiddleware、logger、z、getClientIp）。getClientIp 只透過 SERVER_TRUSTED_PROXIES（預設信任內網位址）解析 X-Forwarded-For。
+- libs/router/：掃描 routes/ 轉成 method 與 path，組出每條路由的 middleware 鏈並註冊到 Hono，重複路由會報錯。
 - libs/openapi.ts：把 RouteDocs 轉成 hono-openapi 的格式，並提供產生 OpenAPI 文件的 handler；handler 的 `defaultDocs` 會套用到所有有文件的路由（例如每支路由都可能回傳的錯誤），路由自己的同狀態碼回應優先；其餘選項（例如 `exclude` 排除路徑）原樣交給 hono-openapi。
-- libs/response-validation.ts：開啟 VALIDATE_RESPONSES 時，比對 response 和 schema，不符就印 warning。
-- loaders/routes/
-  - development.ts：動態掃描並 import 路由；失敗只記 log，不中斷啟動。
-  - production.ts：由 generator 產生的靜態 import 加 registerRoutes，gitignored；失敗時啟動直接失敗。
-- generators/routes/production.ts：產生上面那個 prod loader。
+- libs/response-validation.ts：開啟 VALIDATE_RESPONSES 時，比對 response 和 schema，不符只印 warning，不改動回應。
+- loaders/routes/：dev 動態掃描並 import 路由，失敗只記 log、不中斷啟動；prod 用 generators/ 產生的靜態 loader（gitignored），失敗時啟動直接失敗。
 - plugins/bun/auto-imports.ts：掃描 globals 的 export，用 unimport 注入 import，並產生 d.ts。
-- entrypoints/
-  - development.ts：dev 入口。
-  - production.ts：多 worker supervisor，負責重啟和 graceful shutdown。
+- entrypoints/：dev 入口與 prod 多 worker supervisor（重啟、graceful shutdown）。
 - build.ts：build 入口，裡面有 Bun export * bug 的說明。
 
 ### src/ 底下由使用者維護的部分
