@@ -31,21 +31,14 @@ process.once('unhandledRejection', handleFatalError);
 
 // Start
 
-// Import environment-specific runtime initializers.
-// Used for applying side effects like dev-only tooling, schema extensions, etc.
+// Environment-specific side effects, e.g. dev-only tooling or schema extensions.
 await import(`@/runtime-inits/${process.env.NODE_ENV}`);
-
 await (await import('@kcs-project/pack/init')).initializeSystemStartup();
-
-// Load middlewares
 await import('@/middlewares');
-
-// Load routes
 await import(`@/core/loaders/routes/${process.env.NODE_ENV}`);
 
 // Do not open a listener if a signal arrived while startup imports were pending.
 if (!isShuttingDown()) {
-    // Start server
     logger.info('Starting server...');
     server = Bun.serve({
         fetch: honoApp.fetch,

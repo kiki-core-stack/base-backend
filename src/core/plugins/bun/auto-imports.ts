@@ -55,32 +55,23 @@ export function autoImports(options: Partial<AutoImportsOptions>) {
                 ...options,
             };
 
-            // Normalize explicit imports
             const normalizedImports = resolvedOptions.imports.map((importDefinition) => ({
                 ...importDefinition,
                 from: normalizeImportPath(importDefinition.from, corePaths.projectRoot),
             }));
 
-            // Collect and parse source files
             const matchedFiles = await collectMatchedFiles(resolvedOptions.globs);
-
-            // Parse each matched file with mlly.findExports() to extract export symbols
             // Only include named exports and named star exports; skip default exports and type declarations
             const parsedImports = await extractExportsAsImports(matchedFiles);
-
-            // Create a new unimport context to handle auto-imports resolution
             const imports = [
                 ...parsedImports,
                 ...normalizedImports,
             ];
 
             const unimport = createUnimport({ imports });
-
-            // Generate declarations
             await Bun.write(dtsFilePath, `${dtsFileHeader}${await unimport.generateTypeDeclarations()}\n`);
-
-            // Register bun plugin if any imports, otherwise skip
             if (!imports.length) return;
+
             builder.onLoad(
                 {
                     filter: new RegExp(
