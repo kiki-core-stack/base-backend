@@ -11,7 +11,6 @@ src/index.ts 在 auto-hono 的流程上增加：
   - `ctx.createApiSuccessResponse(data?)`（setups/hono-context.ts）。
   - `setupHonoAppErrorHandling`：錯誤、404 與驗證失敗都回 API envelope，訊息依請求語系翻譯。
 - runtime-inits/development.ts：開發時以 `listApiErrorCodes` 檢查錯誤碼不重複。
-- runtime-inits 之後、載入 middleware 之前執行 pack 的 `initializeSystemStartup`（建立預設資料等初始化任務）。
 - graceful-exit.ts：結束時一併關閉 Redis 與 MongoDB 連線。
 
 ## 新增的目錄與檔案
