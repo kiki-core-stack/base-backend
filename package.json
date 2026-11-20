@@ -3,7 +3,7 @@
   "private": true,
   "scripts": {
     "base:dev": "NODE_ENV=development bun --env-file=./.env.development.local",
-    "base:prod": "NODE_ENV=production bun --env-file=./.env.production.local",
+    "base:prod": "NODE_ENV=production bun",
     "bootstrap:dev": "bun run base:dev -- run ./src/core/bootstrap/index.ts",
     "bootstrap:prod": "bun run base:prod -- run ./src/core/bootstrap/index.ts",
     "build": "bun run base:prod -- run ./src/core/build.ts",
