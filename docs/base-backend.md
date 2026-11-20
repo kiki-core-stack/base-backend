@@ -26,7 +26,7 @@ src/index.ts 在 auto-hono 的流程上增加：
 
 ## 設定
 
-`.env.development`（複製為 `.env.development.local`）比 auto-hono 多：
+開發時讀 `.env.development.local`（範例 `.env.development`）；正式環境不讀 env 檔，image 也不含（`.dockerignore` 排除 `.env*`），設定由容器的環境變數與 secret 提供（`docker-entrypoint.sh` 把 `/run/secrets/*` 匯出為環境變數）。比 auto-hono 多的設定：
 
 - `COOKIE_SESSION_KEYS`：至少 32 bytes 的任意字串（不可含逗號，pack 以 HKDF-SHA256 轉成 AES-256 金鑰），以逗號分隔輪替（第一把用於加密）；產生方式見檔內註解。
 - `MONGODB_URI`（需 replica set）、`REDIS_URL`（需支援 RESP3）。
