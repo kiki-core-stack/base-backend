@@ -28,5 +28,5 @@ src/index.ts 在 auto-hono 的流程上增加：
 
 開發時讀 `.env.development.local`（由 main 的開發 profile 產生）；正式環境不讀 env 檔，設定由容器的環境變數與 secret 提供。比 auto-hono 多的設定：
 
-- `COOKIE_SESSION_KEYS`：至少 32 bytes 的任意字串（不可含逗號，pack 以 HKDF-SHA256 轉成 AES-256 金鑰），以逗號分隔輪替（第一把用於加密）；產生方式見檔內註解。
+- `COOKIE_SESSION_KEYS`：以逗號分隔輪替（第一把用於加密），每把的格式同 pack `docs/auth.md` 的 `AUTH_SECRET_ENCRYPTION_KEYS`。
 - `MONGODB_URI`（需 replica set）、`REDIS_URL`（需支援 RESP3）。
