@@ -8,7 +8,7 @@ import { honoApp } from '@/core/app';
 honoApp.use(
     '/api/*',
     cookieSession({
-        keys: checkAndGetEnvValue('COOKIE_SESSION_KEYS'),
+        keys: getRequiredEnv('COOKIE_SESSION_KEYS'),
         tokenHandler: createCookieTokenHandler(),
     }),
 );
