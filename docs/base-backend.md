@@ -8,7 +8,6 @@ src/index.ts 在 auto-hono 的流程上增加：
 
 - 最先載入 `@/setups`（一次性的副作用）：
   - pack 的 mongoose model 擴充（`mongoose-model-extensions`）：預設啟用 `assertUpdateIfNotModified`；其餘擴充（例如 `findByRouteIdOrThrowNotFoundError`）需要時在 `setups/index.ts` 加上對應檔案的 import。
-  - `ctx.createApiSuccessResponse(data?)`（setups/hono-context.ts）。
   - `setupHonoAppErrorHandling`：錯誤、404 與驗證失敗都回 API envelope，訊息依請求語系翻譯。
 - runtime-inits/development.ts：開發時以 `listApiErrorCodes` 檢查錯誤碼不重複。
 - graceful-exit.ts：結束時一併關閉 Redis 與 MongoDB 連線。
@@ -20,7 +19,6 @@ src/index.ts 在 auto-hono 的流程上增加：
 - middlewares/：
   - core/locale.ts：設定 `ctx.var.locale`；排在最前面，讓錯誤與 404 也能翻譯。
   - context/cookie-session.ts：`/api/*` 掛上 pack 的 `cookieSession()`（金鑰為 `COOKIE_SESSION_KEYS`）。
-- types/cookie-session.ts：以 `declare module` 擴充 `CookieSessionData`。
 - routes/api/public/api-error-code/list.get.dev.ts：開發用的錯誤碼清單，供前端 codegen 使用。
 - routes/docs/openapi.json.get.dev.ts：以 `defaultDocs` 為每支有文件的路由加上 `internalServerError`，路由的 `apiDocs.responses(...)` 只列自己會拋出的錯誤；`/api/internal/*`（服務之間呼叫）不列入文件。前端可以此產生 API client（pack `generateOpenApiClient`）。
 
