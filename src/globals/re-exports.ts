@@ -1,4 +1,5 @@
 export * as apiErrors from '@/api-errors';
+export { appLocaleCatalogs } from '@/i18n/catalogs';
 
 export * as WsIoEventNames from '@kcs-project/pack/constants/ws.io-event-names';
 export * as apiDocs from '@kcs-project/pack/hono-backend/libs/api/docs';

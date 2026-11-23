@@ -15,9 +15,10 @@ src/index.ts 在 auto-hono 的流程上增加：
 ## 新增的目錄與檔案
 
 - api-errors/：錯誤碼命名空間。pack 的 `auth`、`common` 逐一 re-export；本 repo 的錯誤另開命名空間（例如 `export * as forum from './forum';`）。
+- i18n/：本 repo 的訊息 catalog（`messages/<locale>.ts`，型別由 `en` 推導），自動匯入為 `appLocaleCatalogs`，傳給 `defineApiErrors`、`z.i18nIssue`、`throwFieldValidationError`。
 - globals/re-exports.ts：自動匯入 pack 與常用工具；全域的 `z` 是 pack 的擴充版本（core/globals 不匯出 zod 的 `z`）。API 路由的驗證一律用 `apiValidator`，不用 auto-hono 的 `routeValidator`，驗證錯誤才會是 API 錯誤格式。
 - middlewares/：
-  - core/locale.ts：設定 `ctx.var.locale`；排在最前面，讓錯誤與 404 也能翻譯。
+  - core/locale-detector.ts：設定 `ctx.var.locale`；排在最前面，讓錯誤與 404 也能翻譯。
   - context/cookie-session.ts：`/api/*` 掛上 pack 的 `cookieSession()`（金鑰為 `COOKIE_SESSION_KEYS`）。
 - routes/api/public/api-error-code/list.get.dev.ts：開發用的錯誤碼清單，供前端 codegen 使用。
 - routes/docs/openapi.json.get.dev.ts：以 `defaultDocs` 為每支有文件的路由加上 `internalServerError`，路由的 `apiDocs.responses(...)` 只列自己會拋出的錯誤；`/api/internal/*`（服務之間呼叫）不列入文件。前端可以此產生 API client（pack `generateOpenApiClient`）。
