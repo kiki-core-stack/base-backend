@@ -15,7 +15,6 @@ type CreateHandlers = ReturnType<typeof createFactory>['createHandlers'];
  * The second call is Hono's `createHandlers`, so middleware Env/Input types merge into the final handler.
  */
 export function defineRoute(...args: RouteMetaArgs): CreateHandlers {
-    // Defaults to {} only when every RouteMeta field is optional.
     const meta: Partial<RouteMeta> = args[0] ?? {};
     const createHandlers = (...handlers: unknown[]) => Object.assign(handlers, { [routeMetaSymbol]: meta });
     return createHandlers as unknown as CreateHandlers;

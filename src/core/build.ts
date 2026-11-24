@@ -5,7 +5,6 @@ import { runBuild } from '../../build';
 import * as corePaths from './constants/paths';
 import { logger } from './logger';
 
-// Generate routes before the shared build pipeline runs.
 await import('./generators/routes/production');
 
 logger.info('Starting build...');
