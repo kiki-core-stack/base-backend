@@ -30,8 +30,6 @@ process.once('uncaughtException', handleFatalError);
 process.once('unhandledRejection', handleFatalError);
 
 // Start
-
-// Environment-specific side effects, e.g. dev-only tooling or schema extensions.
 await import(`@/runtime-inits/${process.env.NODE_ENV}`);
 await import('@/middlewares');
 await import(`@/core/loaders/routes/${process.env.NODE_ENV}`);
