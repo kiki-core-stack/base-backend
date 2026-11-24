@@ -2,26 +2,11 @@
 
 在 auto-hono（[docs/auto-hono.md](./auto-hono.md)）之上接入 pack：錯誤處理與錯誤碼、多語系、cookie session、MongoDB 與 Redis、啟動初始化。共用規則（API 回應格式、錯誤碼、多語系、權限）見 [pack docs](https://github.com/kiki-core-stack/pack/blob/main/docs/pack.md)。以下只列與 auto-hono 不同的部分。
 
-## 啟動流程
+## 與 auto-hono 的差異
 
-src/index.ts 在 auto-hono 的流程上增加：
-
-- 最先載入 `@/setups`（一次性的副作用）：
-  - pack 的 mongoose model 擴充（`mongoose-model-extensions`）：預設啟用 `assertUpdateIfNotModified`；其餘擴充（例如 `findByRouteIdOrThrowNotFoundError`）需要時在 `setups/index.ts` 加上對應檔案的 import。
-  - `setupHonoAppErrorHandling`：錯誤、404 與驗證失敗都回 API envelope，訊息依請求語系翻譯。
-- runtime-inits/development.ts：開發時以 `listApiErrorCodes` 檢查錯誤碼不重複。
-- graceful-exit.ts：結束時一併關閉 Redis 與 MongoDB 連線。
-
-## 新增的目錄與檔案
-
-- api-errors/：錯誤碼命名空間。pack 的 `auth`、`common` 逐一 re-export；本 repo 的錯誤另開命名空間（例如 `export * as forum from './forum';`）。
-- i18n/：本 repo 的訊息 catalog（`messages/<locale>.ts`，型別由 `en` 推導），自動匯入為 `appLocaleCatalogs`，傳給 `defineApiErrors`、`z.i18nIssue`、`throwFieldValidationError`。
-- globals/re-exports.ts：自動匯入 pack 與常用工具；全域的 `z` 是 pack 的擴充版本（core/globals 不匯出 zod 的 `z`）。API 路由的驗證一律用 `apiValidator`，不用 auto-hono 的 `routeValidator`，驗證錯誤才會是 API 錯誤格式。
-- middlewares/：
-  - core/locale-detector.ts：設定 `ctx.var.locale`；排在最前面，讓錯誤與 404 也能翻譯。
-  - context/cookie-session.ts：`/api/*` 掛上 pack 的 `cookieSession()`（金鑰為 `COOKIE_SESSION_KEYS`）。
-- routes/api/public/api-error-code/list.get.dev.ts：開發用的錯誤碼清單，供前端 codegen 使用。
-- routes/docs/openapi.json.get.dev.ts：以 `defaultDocs` 為每支有文件的路由加上 `internalServerError`，路由的 `apiDocs.responses(...)` 只列自己會拋出的錯誤；`/api/internal/*`（服務之間呼叫）不列入文件。前端可以此產生 API client（pack `generateOpenApiClient`）。
+- src/index.ts 最先載入 `@/setups`（一次性的副作用）：mongoose model 擴充預設只啟用 `assertUpdateIfNotModified`，其餘擴充（例如 `findByRouteIdOrThrowNotFoundError`）需要時在 `setups/index.ts` 加上對應的 import。
+- i18n/：本 repo 的訊息 catalog 自動匯入為 `appLocaleCatalogs`，傳給 `defineApiErrors`、`z.i18nIssue`、`throwFieldValidationError`。
+- globals/re-exports.ts：全域的 `z` 是 pack 的擴充版本（core/globals 不匯出 zod 的 `z`）。API 路由的驗證一律用 `apiValidator`，不用 auto-hono 的 `routeValidator`，驗證錯誤才會是 API 錯誤格式。
 
 ## 設定
 
