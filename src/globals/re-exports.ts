@@ -10,6 +10,8 @@ export {
 } from '@kcs-project/pack/hono-backend/libs/api/validator';
 export * as z from '@kcs-project/pack/libs/zod/backend';
 export * as lruStore from '@kcs-project/pack/stores/lru';
+// Upstream pack's Redis store module is empty, but downstream packs add stores that are used as values.
+// eslint-disable-next-line ts/consistent-type-exports
 export * as redisStore from '@kcs-project/pack/stores/redis';
 export { getDefaultMongooseConnection } from '@kikiutils/mongoose/connection';
 export { EnhancedDate } from '@kikiutils/shared/classes/enhanced-date';
