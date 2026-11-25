@@ -6,7 +6,7 @@
 
 - src/index.ts 最先載入 `@/setups`（一次性的副作用）：mongoose model 擴充預設只啟用 `assertUpdateIfNotModified`，其餘擴充（例如 `findByRouteIdOrThrowNotFoundError`）需要時在 `setups/index.ts` 加上對應的 import。
 - i18n/：本 repo 的訊息 catalog 自動匯入為 `appLocaleCatalogs`，傳給 `defineApiErrors`、`z.i18nIssue`、`throwFieldValidationError`。
-- globals/re-exports.ts：全域的 `z` 是 pack 的擴充版本（core/globals 不匯出 zod 的 `z`）。API 路由的驗證一律用 `apiValidator`，不用 auto-hono 的 `routeValidator`，驗證錯誤才會是 API 錯誤格式。
+- globals/re-exports.ts：全域的 `z` 是 pack 的擴充版本（core/globals 不匯出 zod 的 `z`）。
 
 ## 設定
 
