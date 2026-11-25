@@ -1,6 +1,12 @@
 {
   "type": "module",
   "private": true,
+  "devEngines": {
+    "packageManager": {
+      "name": "bun",
+      "onFail": "error"
+    }
+  },
   "scripts": {
     "base:dev": "NODE_ENV=development bun --env-file=./.env.development.local",
     "base:prod": "NODE_ENV=production bun",
