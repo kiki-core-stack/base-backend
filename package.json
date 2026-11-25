@@ -1,6 +1,12 @@
 {
   "type": "module",
   "private": true,
+  "devEngines": {
+    "packageManager": {
+      "name": "bun",
+      "onFail": "error"
+    }
+  },
   "scripts": {
     "build": "NODE_ENV=production bun --env-file=./.env.production.local run ./build.ts",
     "dev": "NODE_ENV=development nodemon",
