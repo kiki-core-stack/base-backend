@@ -25,6 +25,8 @@ export async function gracefulExit(server?: Server<any>) {
                         await server?.stop().catch((error) => errors.push(error));
 
                         // Close application-owned resources here, after requests have drained.
+                        await wsIoClient.disconnect().catch((error) => errors.push(error));
+
                         redisClient.close();
                         await mongoose.disconnect().catch((error) => errors.push(error));
 

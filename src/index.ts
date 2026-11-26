@@ -36,6 +36,8 @@ await import(`@/core/loaders/routes/${process.env.NODE_ENV}`);
 
 // Do not open a listener if a signal arrived while startup imports were pending.
 if (!isShuttingDown()) {
+    await wsIoClient.connect();
+
     logger.info('Starting server...');
     server = Bun.serve({
         fetch: honoApp.fetch,
