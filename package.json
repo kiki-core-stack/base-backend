@@ -14,7 +14,7 @@
     "knip:exports": "knip --exports",
     "lint": "eslint --cache --concurrency=auto --max-warnings 0",
     "lint:fix": "eslint --cache --concurrency=auto --fix --max-warnings 0",
-    "typecheck": "tsc"
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {},
   "devDependencies": {
